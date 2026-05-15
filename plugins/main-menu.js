@@ -70,28 +70,6 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
   try {
 
-    let user = global.db.data.users[m.sender]
-
-    if (!user.registered) {
-
-      let fotoPerfil = 'https://files.catbox.moe/vb9zu1.jpg'
-
-      try {
-        let pp = await conn.profilePictureUrl(m.sender, 'image')
-        if (pp) fotoPerfil = pp
-      } catch {}
-
-      return await conn.sendMessage(m.chat, {
-        image: { url: fotoPerfil },
-        caption: `
-ㅤ    ꒰ ❌ *Saki - вσт* ⫏⫏ ꒱
-
-> Debes registrarte primero
-> Usa: ${_p}reg
-`.trim()
-      }, { quoted: m })
-    }
-
     const { exp, level } = user
     const { min, xp } = xpRange(level, global.multiplier)
     const name = await conn.getName(m.sender)
