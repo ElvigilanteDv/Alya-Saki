@@ -70,6 +70,16 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
 
   try {
 
+    let user = global.db.data.users[m.sender]
+    
+    if (!user) {
+      user = {
+        exp: 0,
+        level: 0
+      }
+      global.db.data.users[m.sender] = user
+    }
+
     const { exp, level } = user
     const { min, xp } = xpRange(level, global.multiplier)
     const name = await conn.getName(m.sender)
