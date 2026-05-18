@@ -3,7 +3,6 @@ import { createRequire } from 'module'
 import { fileURLToPath } from 'url'
 import { setupMaster, fork } from 'cluster'
 import { existsSync, writeFileSync } from 'fs'
-import cfonts from 'cfonts'
 import chalk from 'chalk'
 
 console.log(chalk.bold.hex('#FF69B4')('\n🌸─ Iɴɪᴄɪᴀɴᴅᴏ αℓуα - вσт ─🌸'))
