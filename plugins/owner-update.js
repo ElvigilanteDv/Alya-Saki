@@ -7,9 +7,8 @@ let handler = async (m, { conn, args, isOwner }) => {
 𑁍𓂃 𓈒𓏸 *ERROR ::* Solo el creador puede usar este comando
 𑁍𓂃 𓈒𓏸 *TIPO ::* Owner
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com`, m)
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*`, m)
   }
 
   const imagenURL = 'https://files.catbox.moe/vb9zu1.jpg'
@@ -20,9 +19,8 @@ https://dvlyonnxz.onrender.com`, m)
 𑁍𓂃 𓈒𓏸 *ESTADO ::* Actualizando...
 𑁍𓂃 𓈒𓏸 *TIEMPO ::* Por favor espera
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com`, m)
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*`, m)
 
     const output = execSync('git pull' + (args.length ? ' ' + args.join(' ') : '')).toString()
     const isUpdated = output.includes('Already up to date')
@@ -32,9 +30,8 @@ https://dvlyonnxz.onrender.com`, m)
 𑁍𓂃 𓈒𓏸 *ESTADO ::* ${isUpdated ? '✅ Ya estaba actualizada' : '✅ Actualización aplicada'}
 ${isUpdated ? '' : '\n𑁍𓂃 𓈒𓏸 *CAMBIOS ::*\n' + output.slice(0, 300)}
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com`
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*`
 
     await conn.sendMessage(m.chat, {
       image: { url: imagenURL },
@@ -73,9 +70,8 @@ https://dvlyonnxz.onrender.com`
 
 𑁍𓂃 𓈒𓏸 *ERROR ::* ${conflictMsg}
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com`
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*`
 
     await conn.sendMessage(m.chat, {
       image: { url: imagenURL },
