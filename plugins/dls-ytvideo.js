@@ -1,11 +1,15 @@
 import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
+import { exec } from 'child_process'
+import util from 'util'
 import {
   generateWAMessageFromContent,
   prepareWAMessageMedia,
   proto
 } from '@whiskeysockets/baileys'
+
+const execPromise = util.promisify(exec)
 
 let pendientes = {}
 
@@ -336,18 +340,25 @@ handler.before = async (m, { conn }) => {
       const tmpDir = path.join(process.cwd(), 'tmp')
       if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
 
-      const videoPath = path.join(tmpDir, `${Date.now()}.mp4`)
+      const videoPath = path.join(tmpDir, `input_${Date.now()}.mp4`)
+      const outputPath = path.join(tmpDir, `output_${Date.now()}.mp4`)
+
       const videoRes = await fetch(pendiente.url)
       const videoBuffer = await videoRes.buffer()
       fs.writeFileSync(videoPath, videoBuffer)
 
+      await execPromise(`ffmpeg -i "${videoPath}" -c:v libx264 -c:a aac -movflags +faststart "${outputPath}"`)
+
+      const convertedBuffer = fs.readFileSync(outputPath)
+
       await conn.sendMessage(m.chat, {
-        video: fs.readFileSync(videoPath),
+        video: convertedBuffer,
         mimetype: 'video/mp4',
         fileName: `${pendiente.title}.mp4`
       }, { quoted: m })
 
       fs.unlinkSync(videoPath)
+      fs.unlinkSync(outputPath)
       delete pendientes[chatId]
       await m.react('✅')
       return true
