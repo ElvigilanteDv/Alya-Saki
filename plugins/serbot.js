@@ -1,8 +1,8 @@
 // ============================================
 // ⚠️ PROHIBIDO ADAPTAR O MODIFICAR ESTE CÓDIGO
-// 👑 CREADOR ORIGINAL: EDWARD
+// 👑 CREADOR ORIGINAL: EL VIGILANTE
 // 🤖 BOT: SAKI BOT
-// 📅 COPYRIGHT © 2026 - EDWARD
+// 📅 COPYRIGHT © 2026 - EL VIGILANTE
 // 🔒 TODOS LOS DERECHOS RESERVADOS
 // ============================================
 
@@ -33,9 +33,8 @@ let rtx = `
 𑁍𓂃 𓈒𓏸 3. Escanea el código QR que aparece aquí
 𑁍𓂃 𓈒𓏸 4. ⏱️ Tiempo: 45 segundos
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
 `
 
 let rtx2 = `
@@ -46,9 +45,8 @@ let rtx2 = `
 𑁍𓂃 𓈒𓏸 2. Toca "Vincular con código de 8 dígitos"
 𑁍𓂃 𓈒𓏸 3. Ingresa el código que aparece aquí
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
 `
 
 const maxSubBots = 500
@@ -98,9 +96,8 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
 𑁍𓂃 𓈒𓏸 *ERROR ::* Comando desactivado temporalmente
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `.trim())
   }
 
@@ -115,9 +112,8 @@ https://dvlyonnxz.onrender.com
 
 𑁍𓂃 𓈒𓏸 *ESPERA ::* ${msToTime(remaining)} antes de vincular
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `.trim(), m)
   }
 
@@ -136,9 +132,8 @@ https://dvlyonnxz.onrender.com
 𑁍𓂃 𓈒𓏸 *ERROR ::* Límite de *${maxSubBots} sub-bots* alcanzado
 𑁍𓂃 𓈒𓏸 No se pueden conectar más
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `.trim())
   }
 
@@ -313,9 +308,8 @@ export async function alyaJadiBot(options) {
 𑁍𓂃 𓈒𓏸 *USUARIO ::* @${m.sender.split('@')[0]}
 𑁍𓂃 𓈒𓏸 *NOMBRE ::* Saki-Sub-Bot
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
             `.trim(),
             mentions: [m.sender]
           },
@@ -335,10 +329,10 @@ https://dvlyonnxz.onrender.com
     }
   }, 60000)
 
-  let handler = await import('../Alya-Bot/handler.js')
+  let handler = await import('../Saki-Bot/handler.js')
   let creloadHandler = async function (restatConn) {
     try {
-      const Handler = await import(`../Alya-Bot/handler.js?update=${Date.now()}`).catch(console.error)
+      const Handler = await import(`../Saki-Bot/handler.js?update=${Date.now()}`).catch(console.error)
       if (Object.keys(Handler || {}).length) handler = Handler
     } catch (e) { }
     if (restatConn) {
