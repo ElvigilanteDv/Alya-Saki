@@ -22,7 +22,7 @@ const defaultMenu = {
   before: `
 > ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡ Soy 𓆩⚝𓆪 Saki 𓍯 Kujou 𓆩⚝𓆪, un gusto conocerte. Estoy aquí para lo que necesites ♡
 
-𑁍𓂃 𓈒𓏸 *DEVELOPER ::* EL VIGILANTE
+𑁍𓂃 𓈒𓏸 *DEVELOPER ::* El Vigilante
 𑁍𓂃 𓈒𓏸 *MANO DERECHA ::* Leo
 𑁍𓂃 𓈒𓏸 *TIPO ::* Owner
 𑁍𓂃 𓈒𓏸 *SISTEMA/OPR ::* android
@@ -39,7 +39,7 @@ const defaultMenu = {
   footer: '',
   after: `
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Saki desarrollado por El Vigilante* ૮(˶ᵔᵕᵔ˶)ა
 > *Mano Derecha: Leo*
 
 https://dvlyonnxz.onrender.com
