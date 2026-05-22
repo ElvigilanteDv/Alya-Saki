@@ -21,7 +21,8 @@ const defaultMenu = {
   before: `
 > ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡ Soy 𓆩⚝𓆪 Saki 𓍯 Kujou 𓆩⚝𓆪, un gusto conocerte. Estoy aquí para lo que necesites ♡
 
-𑁍𓂃 𓈒𓏸 *DEVELOPER ::* Edward
+𑁍𓂃 𓈒𓏸 *DEVELOPER ::* EL VIGILANTE
+𑁍𓂃 𓈒𓏸 *MANO DERECHA ::* Leo
 𑁍𓂃 𓈒𓏸 *TIPO ::* Owner
 𑁍𓂃 𓈒𓏸 *SISTEMA/OPR ::* android
 𑁍𓂃 𓈒𓏸 *TIME ::* %time
@@ -37,7 +38,8 @@ const defaultMenu = {
   footer: '',
   after: `
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
 
 https://dvlyonnxz.onrender.com
 `
@@ -71,7 +73,7 @@ const handler = async (m, { conn, usedPrefix: _p }) => {
   try {
 
     let user = global.db.data.users[m.sender]
-    
+
     if (!user) {
       user = {
         exp: 0,
