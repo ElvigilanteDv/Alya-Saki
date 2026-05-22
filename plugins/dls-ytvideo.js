@@ -3,6 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import {
   generateWAMessageFromContent,
+  prepareWAMessageMedia,
   proto
 } from '@whiskeysockets/baileys'
 
@@ -63,7 +64,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let isDirectLink = query.includes('youtu.be') || query.includes('youtube.com')
 
   try {
-    // Si no es enlace directo, buscar en YouTube
     if (!isDirectLink) {
       const searchUrl = `https://api-de-el-vigilante-8jnf.onrender.com/search/youtube?q=${encodeURIComponent(query)}`
       const searchRes = await fetch(searchUrl)
@@ -113,7 +113,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       return
     }
 
-    // Si es enlace directo, procesar descarga inmediata
     await m.reply(`⏳ *Procesando video...*`)
 
     const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytvideo?url=${encodeURIComponent(videoUrl)}`
@@ -139,7 +138,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       if (pendientes[chatId]) delete pendientes[chatId]
     }, 60000)
 
-    // Descargar miniatura para el mensaje interactivo
     let media = null
     const tmpDir = path.join(process.cwd(), 'tmp')
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
@@ -150,7 +148,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       if (thumbRes.ok) {
         const thumbBuffer = await thumbRes.buffer()
         fs.writeFileSync(thumbPath, thumbBuffer)
-        media = await conn.prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
+        media = await prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
         fs.unlinkSync(thumbPath)
       }
     }
@@ -167,7 +165,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
                 header: '📥 TOCA PARA DESCARGAR',
                 title: title.substring(0, 35),
                 description: `Duración: ${duracion} | Calidad: ${quality || '360p'}`,
-                id: `video_${chatId}`
+                id: `video_download_${chatId}`
               }
             ]
           }
@@ -221,8 +219,7 @@ handler.before = async (m, { conn }) => {
     const data = JSON.parse(nativeFlow.paramsJson || '{}')
     const id = data.id || data.selectedId || data.selectedRowId || null
 
-    // Manejar selección de búsqueda
-    if (id && id.startsWith('video_') && !id.startsWith('video_download_')) {
+    if (id && id.startsWith('video_') && !id.includes('download')) {
       const parts = id.split('_')
       const urlBase64 = parts[2]
       const titleBase64 = parts[3]
@@ -265,7 +262,7 @@ handler.before = async (m, { conn }) => {
         if (thumbRes.ok) {
           const thumbBuffer = await thumbRes.buffer()
           fs.writeFileSync(thumbPath, thumbBuffer)
-          media = await conn.prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
+          media = await prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
           fs.unlinkSync(thumbPath)
         }
       }
@@ -324,8 +321,7 @@ handler.before = async (m, { conn }) => {
       return true
     }
 
-    // Manejar descarga directa
-    if (id && id.startsWith('video_download_')) {
+    if (id && id.includes('download')) {
       const chatId = id.replace('video_download_', '')
       const pendiente = pendientes[chatId]
 
