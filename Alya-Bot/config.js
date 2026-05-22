@@ -10,9 +10,9 @@ import moment from 'moment-timezone';
 global.botNumber = '';
 
 global.owner = [
-  ['59177474230', '👁️ EL VIGILANTE', true],
-  ['59177474230@s.whatsapp.net', 'EL VIGILANTE', true],
-  ['59177474230@c.us', 'EL VIGILANTE', true],
+  ['59177474230', '👑 E∂ωαя∂', true],
+  ['59177474230@s.whatsapp.net', 'E∂ωαя∂', true],
+  ['59177474230@c.us', 'E∂ωαя∂', true],
   ['584241819270', '🤝 Lєσ', true],
   ['584241819270@s.whatsapp.net', 'Lєσ', true],
   ['584241819270@c.us', 'Lєσ', true]
@@ -36,9 +36,9 @@ global.packsticker = `
 > ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
 𑁍𓂃 𓈒𓏸 *STICKER* 
-𑁍𓂃 𓈒𓏸 *CREADOR:* EL VIGILANTE
+𑁍𓂃 𓈒𓏸 *CREADOR:* E∂ωαя∂
 
-> *Saki desarrollada por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`;
+> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა`;
 
 global.packname = 'Saki - вσт';
 
@@ -47,16 +47,16 @@ global.author = `
 
 𑁍𓂃 𓈒𓏸 *SAKI BOT*
 
-> *Saki desarrollada por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`;
+> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა`;
 
 global.wm = 'Saki - вσт';
 global.titulowm = 'Saki - вσт';
-global.igfg = 'EL VIGILANTE';
+global.igfg = 'E∂ωαя∂';
 global.botname = 'Saki - вσт';
-global.dev = '> *Saki desarrollada por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა';
-global.textbot = 'Saki - вσт : EL VIGILANTE';
+global.dev = '> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა';
+global.textbot = 'Saki - вσт : E∂ωαя∂';
 global.gt = 'Saki - вσт';
-global.namechannel = 'Saki - вσт / EL VIGILANTE';
+global.namechannel = 'Saki - вσт / E∂ωαя∂';
 
 global.monedas = 'мσηє∂αѕ';
 
@@ -65,9 +65,9 @@ global.gp2 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
 global.comunidad1 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
 global.channel = '';
 global.cn = global.channel;
-global.yt = 'https://youtube.com/@ELVIGILANTE';
-global.md = 'https://github.com/ELVIGILANTE/Saki-Bot';
-global.correo = 'elvigilante@sakibot.com';
+global.yt = 'https://youtube.com/@E∂ωαя∂';
+global.md = 'https://github.com/Edward/Saki-Bot';
+global.correo = 'edward@sakibot.com';
 
 global.catalogo = null;
 try {
