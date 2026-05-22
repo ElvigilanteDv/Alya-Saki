@@ -14,7 +14,8 @@ const tags = {
   game: 'gαмє',
   serbot: 'ѕєявσт',
   owner: 'σωηєя',
-  downloader: '∂σωηℓσα∂єя' 
+  downloader: '∂σωηℓσα∂єя',
+  info: 'ιηƒσ'
 }
 
 const defaultMenu = {
