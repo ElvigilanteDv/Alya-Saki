@@ -11,9 +11,8 @@ let handler = async (m, { conn }) => {
 𑁍𓂃 𓈒𓏸 *ESTADO ::* ${ping < 100 ? '🟢 EXCELENTE' : ping < 200 ? '🟡 NORMAL' : '🔴 LENTO'}
 𑁍𓂃 𓈒𓏸 *USUARIO ::* ${m.pushName}
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა
-
-https://dvlyonnxz.onrender.com
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
 `.trim())
 }
 
