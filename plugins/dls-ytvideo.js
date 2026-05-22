@@ -7,6 +7,10 @@ import {
 } from '@whiskeysockets/baileys'
 import fs from 'fs'
 import path from 'path'
+import { exec } from 'child_process'
+import util from 'util'
+
+const execPromise = util.promisify(exec)
 
 let pendientes = {}
 
@@ -111,7 +115,6 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const vistas = formatViews(views)
     const chatId = m.chat
 
-    // Guardar información para la descarga
     pendientes[chatId] = {
       url: url,
       title: title
@@ -121,7 +124,6 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       if (pendientes[chatId]) delete pendientes[chatId]
     }, 60000)
 
-    // Preparar miniatura
     let media = null
     const tmpDir = path.join(process.cwd(), 'tmp')
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
@@ -230,19 +232,28 @@ handler.before = async (m, { conn }) => {
       const tmpDir = path.join(process.cwd(), 'tmp')
       if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
 
-      const videoPath = path.join(tmpDir, `${Date.now()}.mp4`)
+      const inputPath = path.join(tmpDir, `input_${Date.now()}.mp4`)
+      const outputPath = path.join(tmpDir, `output_${Date.now()}.mp4`)
+
       const videoRes = await fetch(download_url)
       const videoBuffer = await videoRes.buffer()
-      fs.writeFileSync(videoPath, videoBuffer)
+      fs.writeFileSync(inputPath, videoBuffer)
+
+      await conn.sendMessage(m.chat, { text: `🔄 *Convirtiendo video con ffmpeg...*` }, { quoted: m })
+
+      await execPromise(`ffmpeg -i "${inputPath}" -c:v libx264 -c:a aac -movflags +faststart "${outputPath}"`)
+
+      const convertedBuffer = fs.readFileSync(outputPath)
 
       await conn.sendMessage(m.chat, {
-        video: fs.readFileSync(videoPath),
+        video: convertedBuffer,
         mimetype: 'video/mp4',
         fileName: `${title}.mp4`,
         caption: `✅ Video descargado\n\n🎬 Título: ${title}`
       }, { quoted: m })
 
-      fs.unlinkSync(videoPath)
+      fs.unlinkSync(inputPath)
+      fs.unlinkSync(outputPath)
       delete pendientes[chatId]
       await m.react('✅')
       return true
@@ -252,7 +263,7 @@ handler.before = async (m, { conn }) => {
 
   } catch (e) {
     console.error(e)
-    await conn.sendMessage(m.chat, { text: `❌ Error al procesar: ${e.message}` }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: `❌ Error: ${e.message}` }, { quoted: m })
     await m.react('❌')
     return true
   }
@@ -277,9 +288,6 @@ const extractVideoId = (url) => {
     url.match(/youtu\.be\/([0-9A-Za-z_-]{11})/)
   return match?.[1] || null
 }
-
-const cleanName = (name) =>
-  String(name).replace(/[^\w\s._-]/gi, "").substring(0, 50)
 
 handler.command = ["ytvideo", "yt2", "play2"]
 handler.tags = ["downloader"]
