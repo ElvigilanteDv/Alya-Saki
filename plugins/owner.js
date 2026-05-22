@@ -13,7 +13,7 @@ let handler = async (m, { conn, usedPrefix }) => {
           title: '📋 CONTACTOS',
           rows: [
             {
-              header: '👁️ EL VIGILANTE',
+              header: '👁️ EL Vigilante',
               title: 'Creador de Saki Bot',
               description: 'wa.me/59177474230',
               id: `${usedPrefix}owner`
