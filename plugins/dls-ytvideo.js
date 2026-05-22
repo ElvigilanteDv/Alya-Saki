@@ -1,19 +1,16 @@
-import fetch from 'node-fetch'
-import fs from 'fs'
-import path from 'path'
-import { exec } from 'child_process'
-import util from 'util'
+import yts from "yt-search"
+import fetch from "node-fetch"
 import {
   generateWAMessageFromContent,
   prepareWAMessageMedia,
   proto
 } from '@whiskeysockets/baileys'
-
-const execPromise = util.promisify(exec)
+import fs from 'fs'
+import path from 'path'
 
 let pendientes = {}
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
+const handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
     const buttons = {
       name: 'single_select',
@@ -61,80 +58,62 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     return
   }
 
-  await m.react('🎬')
-
-  let query = text.trim()
-  let videoUrl = query
-  let isDirectLink = query.includes('youtu.be') || query.includes('youtube.com')
+  await m.react("🎬")
 
   try {
-    if (!isDirectLink) {
-      const searchUrl = `https://api-de-el-vigilante-8jnf.onrender.com/search/youtube?q=${encodeURIComponent(query)}`
-      const searchRes = await fetch(searchUrl)
-      const searchData = await searchRes.json()
+    let url = text.trim()
+    let title = "Desconocido"
+    let authorName = "Desconocido"
+    let durationTimestamp = "Desconocida"
+    let views = 0
+    let thumbnail = ""
 
-      if (!searchData.status || !searchData.result?.length) {
-        throw new Error('No se encontraron resultados')
+    const isUrl = /^https?:\/\/\S+/i.test(url)
+
+    if (isUrl) {
+      if (!isYouTubeUrl(url)) {
+        return m.reply("🚫 El enlace no es válido de YouTube.")
       }
 
-      const resultados = searchData.result.slice(0, 5)
+      const videoId = extractVideoId(url)
+      if (!videoId) {
+        return m.reply("🚫 No pude extraer el ID del video.")
+      }
 
-      const rows = resultados.map((video, i) => ({
-        header: `🎬 ${video.channel || 'Desconocido'}`,
-        title: video.title.substring(0, 35),
-        description: `⏱️ ${video.duration || '?'} | 👁️ ${video.views || '?'}`,
-        id: `video_${i}_${Buffer.from(video.url).toString('base64')}_${Buffer.from(video.title).toString('base64')}`
-      }))
+      const res = await yts({ videoId })
 
-      const interactiveMessage = proto.Message.InteractiveMessage.create({
-        header: { title: 'Saki - ѕυв', subtitle: 'Selecciona un video', hasMediaAttachment: false },
-        body: { text: `🎬 *${query}*\n\nSe encontraron ${resultados.length} resultados. Selecciona uno:` },
-        footer: { text: '⫏⫏ Saki - вσт ✿' },
-        nativeFlowMessage: {
-          buttons: [{
-            name: 'single_select',
-            buttonParamsJson: JSON.stringify({
-              title: '🎬 VER RESULTADOS',
-              sections: [{
-                title: '📋 SELECCIONA UN VIDEO',
-                rows: rows
-              }]
-            })
-          }]
-        }
-      })
+      if (!res) {
+        return m.reply("🚫 No pude obtener información del video.")
+      }
 
-      const msg = generateWAMessageFromContent(m.chat, {
-        viewOnceMessage: {
-          message: {
-            messageContextInfo: {},
-            interactiveMessage
-          }
-        }
-      }, { quoted: m })
+      title = res.title || title
+      authorName = res.author?.name || authorName
+      durationTimestamp = res.timestamp || durationTimestamp
+      views = res.views || views
+      thumbnail = res.thumbnail || thumbnail
+      url = res.url || url
+    } else {
+      const res = await yts(url)
 
-      await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-      return
+      if (!res?.videos?.length) {
+        return m.reply("🚫 No encontré nada.")
+      }
+
+      const video = res.videos[0]
+      title = video.title || title
+      authorName = video.author?.name || authorName
+      durationTimestamp = video.timestamp || durationTimestamp
+      views = video.views || views
+      url = video.url || url
+      thumbnail = video.thumbnail || thumbnail
     }
 
-    await m.reply(`⏳ *Procesando video...*`)
-
-    const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytvideo?url=${encodeURIComponent(videoUrl)}`
-    const response = await fetch(downloadUrl)
-    const data = await response.json()
-
-    if (!data.status || !data.result?.download_url) {
-      throw new Error('No se pudo obtener el video')
-    }
-
-    const { title, duration, thumbnail, download_url, quality } = data.result
-    const minutos = Math.floor(duration / 60)
-    const segundos = duration % 60
-    const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
-
+    const vistas = formatViews(views)
     const chatId = m.chat
+
+    // Guardar información para la descarga
     pendientes[chatId] = {
-      url: download_url,
+      url: url,
       title: title
     }
 
@@ -142,6 +121,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       if (pendientes[chatId]) delete pendientes[chatId]
     }, 60000)
 
+    // Preparar miniatura
     let media = null
     const tmpDir = path.join(process.cwd(), 'tmp')
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
@@ -168,7 +148,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
               {
                 header: '📥 TOCA PARA DESCARGAR',
                 title: title.substring(0, 35),
-                description: `Duración: ${duracion} | Calidad: ${quality || '360p'}`,
+                description: `⏱️ ${durationTimestamp} | 👁️ ${vistas}`,
                 id: `video_download_${chatId}`
               }
             ]
@@ -187,8 +167,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       body: { text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
 𑁍𓂃 𓈒𓏸 *TÍTULO ::* ${title}
-𑁍𓂃 𓈒𓏸 *DURACIÓN ::* ${duracion}
-𑁍𓂃 𓈒𓏸 *CALIDAD ::* ${quality || '360p'}
+𑁍𓂃 𓈒𓏸 *CANAL ::* ${authorName}
+𑁍𓂃 𓈒𓏸 *DURACIÓN ::* ${durationTimestamp}
+𑁍𓂃 𓈒𓏸 *VISTAS ::* ${vistas}
 
 > *Toca el botón para descargar*
 
@@ -209,9 +190,10 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
 
-  } catch (error) {
-    console.error(error)
-    m.reply(`❌ Error al procesar el enlace o búsqueda. Verifica que sea válido.`)
+  } catch (e) {
+    console.error(e)
+    await m.reply("❌ Error: " + e.message)
+    await m.react("⚠️")
   }
 }
 
@@ -223,109 +205,7 @@ handler.before = async (m, { conn }) => {
     const data = JSON.parse(nativeFlow.paramsJson || '{}')
     const id = data.id || data.selectedId || data.selectedRowId || null
 
-    if (id && id.startsWith('video_') && !id.includes('download')) {
-      const parts = id.split('_')
-      const urlBase64 = parts[2]
-      const titleBase64 = parts[3]
-      const videoUrl = Buffer.from(urlBase64, 'base64').toString()
-      const videoTitle = Buffer.from(titleBase64, 'base64').toString()
-
-      await m.react('⏳')
-      await conn.sendMessage(m.chat, { text: `⏳ *Obteniendo video: ${videoTitle.substring(0, 40)}...*` }, { quoted: m })
-
-      const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytvideo?url=${encodeURIComponent(videoUrl)}`
-      const response = await fetch(downloadUrl)
-      const data = await response.json()
-
-      if (!data.status || !data.result?.download_url) {
-        throw new Error('No se pudo obtener el video')
-      }
-
-      const { title, duration, thumbnail, download_url, quality } = data.result
-      const minutos = Math.floor(duration / 60)
-      const segundos = duration % 60
-      const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
-
-      const chatId = m.chat
-      pendientes[chatId] = {
-        url: download_url,
-        title: title
-      }
-
-      setTimeout(() => {
-        if (pendientes[chatId]) delete pendientes[chatId]
-      }, 60000)
-
-      let media = null
-      const tmpDir = path.join(process.cwd(), 'tmp')
-      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
-
-      if (thumbnail) {
-        const thumbPath = path.join(tmpDir, `thumb_${Date.now()}.jpg`)
-        const thumbRes = await fetch(thumbnail)
-        if (thumbRes.ok) {
-          const thumbBuffer = await thumbRes.buffer()
-          fs.writeFileSync(thumbPath, thumbBuffer)
-          media = await prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
-          fs.unlinkSync(thumbPath)
-        }
-      }
-
-      const buttons = {
-        name: 'single_select',
-        buttonParamsJson: JSON.stringify({
-          title: '🎬 DESCARGAR',
-          sections: [
-            {
-              title: '✅ VIDEO ENCONTRADO',
-              rows: [
-                {
-                  header: '📥 TOCA PARA DESCARGAR',
-                  title: title.substring(0, 35),
-                  description: `Duración: ${duracion} | Calidad: ${quality || '360p'}`,
-                  id: `video_download_${chatId}`
-                }
-              ]
-            }
-          ]
-        })
-      }
-
-      const interactiveMessage = proto.Message.InteractiveMessage.create({
-        header: {
-          title: 'Saki - ѕυв',
-          subtitle: 'Youtube a Video',
-          hasMediaAttachment: !!media,
-          imageMessage: media ? media.imageMessage : undefined
-        },
-        body: { text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
-
-𑁍𓂃 𓈒𓏸 *TÍTULO ::* ${title}
-𑁍𓂃 𓈒𓏸 *DURACIÓN ::* ${duracion}
-𑁍𓂃 𓈒𓏸 *CALIDAD ::* ${quality || '360p'}
-
-> *Toca el botón para descargar*
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*` },
-        footer: { text: '⫏⫏ Saki - вσт ✿' },
-        nativeFlowMessage: { buttons: [buttons] }
-      })
-
-      const msg = generateWAMessageFromContent(m.chat, {
-        viewOnceMessage: {
-          message: {
-            messageContextInfo: {},
-            interactiveMessage
-          }
-        }
-      }, { quoted: m })
-
-      await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-      return true
-    }
-
-    if (id && id.includes('download')) {
+    if (id && id.startsWith('video_download_')) {
       const chatId = id.replace('video_download_', '')
       const pendiente = pendientes[chatId]
 
@@ -337,28 +217,32 @@ handler.before = async (m, { conn }) => {
       await m.react('⏳')
       await conn.sendMessage(m.chat, { text: `⏳ *Descargando ${pendiente.title}...*` }, { quoted: m })
 
+      const apiUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytvideo?url=${encodeURIComponent(pendiente.url)}`
+      const response = await fetch(apiUrl)
+      const data = await response.json()
+
+      if (!data.status || !data.result?.download_url) {
+        throw new Error('No se pudo obtener el video')
+      }
+
+      const { title, download_url } = data.result
+
       const tmpDir = path.join(process.cwd(), 'tmp')
       if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
 
-      const videoPath = path.join(tmpDir, `input_${Date.now()}.mp4`)
-      const outputPath = path.join(tmpDir, `output_${Date.now()}.mp4`)
-
-      const videoRes = await fetch(pendiente.url)
+      const videoPath = path.join(tmpDir, `${Date.now()}.mp4`)
+      const videoRes = await fetch(download_url)
       const videoBuffer = await videoRes.buffer()
       fs.writeFileSync(videoPath, videoBuffer)
 
-      await execPromise(`ffmpeg -i "${videoPath}" -c:v libx264 -c:a aac -movflags +faststart "${outputPath}"`)
-
-      const convertedBuffer = fs.readFileSync(outputPath)
-
       await conn.sendMessage(m.chat, {
-        video: convertedBuffer,
+        video: fs.readFileSync(videoPath),
         mimetype: 'video/mp4',
-        fileName: `${pendiente.title}.mp4`
+        fileName: `${title}.mp4`,
+        caption: `✅ Video descargado\n\n🎬 Título: ${title}`
       }, { quoted: m })
 
       fs.unlinkSync(videoPath)
-      fs.unlinkSync(outputPath)
       delete pendientes[chatId]
       await m.react('✅')
       return true
@@ -374,8 +258,32 @@ handler.before = async (m, { conn }) => {
   }
 }
 
+const formatViews = (views) => {
+  const n = Number(views)
+  if (!n || Number.isNaN(n)) return "No disponible"
+  if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
+  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`
+  return n.toString()
+}
+
+const isYouTubeUrl = (url) => {
+  return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(url)
+}
+
+const extractVideoId = (url) => {
+  const match =
+    url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:[?&/]|\b)/) ||
+    url.match(/youtu\.be\/([0-9A-Za-z_-]{11})/)
+  return match?.[1] || null
+}
+
+const cleanName = (name) =>
+  String(name).replace(/[^\w\s._-]/gi, "").substring(0, 50)
+
+handler.command = ["ytvideo", "yt2", "play2"]
+handler.tags = ["downloader"]
 handler.help = ['ytvideo']
-handler.tags = ['downloader']
-handler.command = ['ytvideo', 'video', 'playvideo']
+handler.register = false
 
 export default handler
