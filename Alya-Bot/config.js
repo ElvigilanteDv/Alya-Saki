@@ -10,53 +10,53 @@ import moment from 'moment-timezone';
 global.botNumber = '';
 
 global.owner = [
-  ['50497305037', '🎭 ℓʏσηη', true],
-  ['50497305037@s.whatsapp.net', 'ℓʏσηη', true],
-  ['59177474230@c.us', 'ℓʏσηη', true],
-  ['529711232646', '🌸 ℓυz', true],
-  ['529711232646@s.whatsapp.net', 'ℓυz', true],
-  ['529711232646@c.us', 'ℓυz', true],
-  ['5219611207992', '👑 Rizar', true],
-  ['5219611207992@s.whatsapp.net', 'Rizar', true],
-  ['5219611207992@c.us', 'Rizar', true],
-  ['18495764630', '🛡️ Madara', true],
-  ['18495764630@s.whatsapp.net', 'Madara', true],
-  ['18495764630@c.us', 'Madara', true]
+  ['59177474230', '👁️ EL VIGILANTE', true],
+  ['59177474230@s.whatsapp.net', 'EL VIGILANTE', true],
+  ['59177474230@c.us', 'EL VIGILANTE', true],
+  ['584241819270', '🤝 Lєσ', true],
+  ['584241819270@s.whatsapp.net', 'Lєσ', true],
+  ['584241819270@c.us', 'Lєσ', true]
 ];
 
-global.mods = ['50497305037', '50497305037@s.whatsapp.net', '529711232646', '529711232646@s.whatsapp.net', '5219611207992', '5219611207992@s.whatsapp.net', '18495764630', '18495764630@s.whatsapp.net'];
-global.suittag = ['59177474230', '529711232646', '5219611207992', '18495764630'];
-global.prems = ['59177474230', '59177474230@s.whatsapp.net', '529711232646', '529711232646@s.whatsapp.net', '5219611207992', '5219611207992@s.whatsapp.net', '18495764630', '18495764630@s.whatsapp.net'];
+global.mods = ['59177474230', '59177474230@s.whatsapp.net', '584241819270', '584241819270@s.whatsapp.net'];
+global.suittag = ['59177474230', '584241819270'];
+global.prems = ['59177474230', '59177474230@s.whatsapp.net', '584241819270', '584241819270@s.whatsapp.net'];
 
 global.libreria = 'Baileys';
 global.baileys = 'V 6.7.9';
 global.languaje = 'Español';
 global.vs = '2.2.0';
 global.vsJB = '5.0';
-global.nameqr = '🌸 αℓуα - вσт 🌸';
-global.sessions = 'AlyaSesions';
-global.jadi = 'AlyaJadiBot';
+global.nameqr = '🌸 Saki - вσт 🌸';
+global.sessions = 'SakiSesions';
+global.jadi = 'SakiJadiBot';
 global.blackJadibts = true;
 
 global.packsticker = `
-ㅤ    ꒰  ㅤ 🌸 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ѕтι¢кєя 木 ✨ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Cяєα∂σя: ℓʏσηη`;
+𑁍𓂃 𓈒𓏸 *STICKER* 
+𑁍𓂃 𓈒𓏸 *CREADOR:* EL VIGILANTE
 
-global.packname = 'αℓуα - вσт';
+> *Saki desarrollada por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`;
+
+global.packname = 'Saki - вσт';
 
 global.author = `
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱`;
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-global.wm = 'αℓуα - вσт';
-global.titulowm = 'αℓуα - вσт';
-global.igfg = 'ℓʏσηη';
-global.botname = 'αℓуα - вσт';
-global.dev = '© ρσωєяє∂ ву ℓʏσηη 💗';
-global.textbot = 'αℓуα - вσт : ℓʏσηη';
-global.gt = 'αℓуα - вσт';
-global.namechannel = 'αℓуα - вσт / ℓʏσηη';
+𑁍𓂃 𓈒𓏸 *SAKI BOT*
+
+> *Saki desarrollada por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`;
+
+global.wm = 'Saki - вσт';
+global.titulowm = 'Saki - вσт';
+global.igfg = 'EL VIGILANTE';
+global.botname = 'Saki - вσт';
+global.dev = '> *Saki desarrollada por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა';
+global.textbot = 'Saki - вσт : EL VIGILANTE';
+global.gt = 'Saki - вσт';
+global.namechannel = 'Saki - вσт / EL VIGILANTE';
 
 global.monedas = 'мσηє∂αѕ';
 
@@ -65,9 +65,9 @@ global.gp2 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
 global.comunidad1 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
 global.channel = '';
 global.cn = global.channel;
-global.yt = 'https://youtube.com/@Lyonn';
-global.md = 'https://github.com/Lyonn/Alya-Bot';
-global.correo = 'lyonn@alyabot.com';
+global.yt = 'https://youtube.com/@ELVIGILANTE';
+global.md = 'https://github.com/ELVIGILANTE/Saki-Bot';
+global.correo = 'elvigilante@sakibot.com';
 
 global.catalogo = null;
 try {
@@ -94,7 +94,7 @@ global.estilo = {
       status: 1, 
       surface : 1, 
       message: global.packname, 
-      orderTitle: 'αℓуα - вσт', 
+      orderTitle: 'Saki - вσт', 
       thumbnail: global.catalogo || Buffer.from(''), 
       sellerJid: '0@s.whatsapp.net'
     }
@@ -116,7 +116,7 @@ global.maxwarn = 3;
 const file = fileURLToPath(import.meta.url);
 watchFile(file, () => {
   unwatchFile(file);
-  console.log(chalk.magenta('🔄 Sє α¢тυαℓízσ ∂є αℓуα - вσт 🌸'));
+  console.log(chalk.magenta('🔄 Sє α¢тυαℓízσ ∂є Saki - вσт 🌸'));
 });
 
 console.log(chalk.green('✅ cσηfιg.נѕ ¢αrgα∂σ ¢σrrє¢тαмєηтє 🌸'));
