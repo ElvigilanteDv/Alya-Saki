@@ -59,7 +59,7 @@ let handler = async (m, { conn, usedPrefix }) => {
   await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
 }
 
-handler.help = ['owner', 'creador']
+handler.help = ['owner']
 handler.tags = ['info']
 handler.command = ['owner', 'creador', 'dueño']
 
