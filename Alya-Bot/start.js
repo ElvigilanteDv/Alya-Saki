@@ -107,15 +107,15 @@ const theme = {
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 const question = (texto) => new Promise((resolver) => rl.question(texto, resolver))
 
-let opcion
-if (methodCodeQR) opcion = '1'
+let opcion = null
+let codeRequested = false
 
 const credsExist = fs.existsSync(`./${global.sessions}/creds.json`)
 
 if (!methodCodeQR && !methodCode && !credsExist) {
     console.log(theme.banner(`
 ╭━━━━━━━━━━━━━━━━━━━━╮
-┃ 🌸 *αℓуα - вσт* 🌸
+┃ 🌸 *Saki - вσт* 🌸
 ┃ *ᴇʟ ᴀsɪsᴛᴇɴᴛᴇ ᴍás ᴄᴏᴍᴘʟᴇᴛᴏ*
 ╰━━━━━━━━━━━━━━━━━━━━╯
     `))
@@ -130,6 +130,10 @@ if (!methodCodeQR && !methodCode && !credsExist) {
             console.log(chalk.bold.redBright(`✨ Opción inválida. Elige 1 o 2.`))
         }
     } while (opcion !== '1' && opcion !== '2')
+} else if (methodCode) {
+    opcion = '2'
+} else if (methodCodeQR) {
+    opcion = '1'
 }
 
 console.info = () => {}
@@ -137,9 +141,9 @@ console.debug = () => {}
 
 const connectionOptions = {
     logger: pino({ level: 'silent' }),
-    printQRInTerminal: opcion == '1' ? true : methodCodeQR ? true : false,
+    printQRInTerminal: opcion === '1' ? true : false,
     mobile: MethodMobile,
-    browser: opcion == '1' ? [`${global.nameqr}`, 'Edge', '20.0.04'] : methodCodeQR ? [`${global.nameqr}`, 'Edge', '20.0.04'] : ['Chrome', 'Edge', '110.0.1587.56'],
+    browser: opcion === '1' ? [`${global.nameqr}`, 'Edge', '20.0.04'] : ['Chrome', 'Edge', '110.0.1587.56'],
     auth: {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -159,37 +163,46 @@ const connectionOptions = {
 
 global.conn = makeWASocket(connectionOptions)
 
-if (!fs.existsSync(`./${global.sessions}/creds.json`)) {
-    if (opcion === '2' || methodCode) {
-        opcion = '2'
-        if (!conn.authState.creds.registered) {
-            let addNumber
-            if (!!phoneNumber) {
-                addNumber = phoneNumber.replace(/[^0-9]/g, '')
+// Manejar código de 8 dígitos solo una vez
+if (opcion === '2' && !credsExist && !codeRequested) {
+    codeRequested = true
+    let addNumber = null
+    
+    if (!!phoneNumber && phoneNumber !== '') {
+        addNumber = phoneNumber.replace(/[^0-9]/g, '')
+        console.log(chalk.bold.cyan(`📌 Usando número configurado: ${addNumber}`))
+    } else {
+        let validNumber = false
+        while (!validNumber) {
+            const inputNumber = await question(chalk.bgMagenta.black(chalk.bold.white(`🌸 INGRESA TU NÚMERO CON CÓDIGO DE PAÍS SIN +:\n🌸➤ `)))
+            const cleanNumber = inputNumber.replace(/\D/g, '')
+            if (cleanNumber.length > 5) {
+                addNumber = cleanNumber
+                validNumber = true
             } else {
-                do {
-                    phoneNumber = await question(chalk.bgMagenta.black(chalk.bold.white(`🌸 INGRESA TU NÚMERO CON CÓDIGO DE PAÍS SIN +:\n🌸➤ `)))
-                    phoneNumber = phoneNumber.replace(/\D/g, '')
-                    if (!phoneNumber.startsWith('+')) {
-                        phoneNumber = `+${phoneNumber}`
-                    }
-                } while (!await isValidPhoneNumber(phoneNumber))
-                rl.close()
-                addNumber = phoneNumber.replace(/\D/g, '')
-                setTimeout(async () => {
-                    let codeBot = await conn.requestPairingCode(addNumber)
-                    codeBot = codeBot?.match(/.{1,4}/g)?.join("-") || codeBot
-                    console.log(chalk.bold.white(chalk.bgMagenta(`🌸 CÓDIGO: ${codeBot} 🌸`)))
-                    console.log(chalk.cyan(`📌 Ingresa este código en WhatsApp > Dispositivos vinculados`))
-                }, 3000)
+                console.log(chalk.bold.red('❌ Número inválido. Intenta de nuevo.'))
             }
         }
+        rl.close()
     }
+    
+    console.log(chalk.bold.cyan(`📌 Solicitando código de 8 dígitos...`))
+    
+    setTimeout(async () => {
+        try {
+            let code = await global.conn.requestPairingCode(addNumber)
+            code = code?.match(/.{1,4}/g)?.join("-") || code
+            console.log(chalk.bold.white(chalk.bgMagenta(`🌸 CÓDIGO: ${code} 🌸`)))
+            console.log(chalk.cyan(`📌 Ingresa este código en WhatsApp > Dispositivos vinculados > Vincular con código de 8 dígitos`))
+        } catch (err) {
+            console.log(chalk.bold.red(`❌ Error al obtener el código: ${err.message}`))
+        }
+    }, 3000)
 }
 
 conn.isInit = false
 conn.well = false
-conn.logger.info(` 🌸 αℓуα - вσт ɪɴɪᴄɪᴀᴅᴀ ᴄᴏʀʀᴇᴄᴛᴀᴍᴇɴᴛᴇ 🌸\n`)
+conn.logger.info(` 🌸 Saki - вσт ɪɴɪᴄɪᴀᴅᴀ ᴄᴏʀʀᴇᴄᴛᴀᴍᴇɴᴛᴇ 🌸\n`)
 
 if (!opts['test']) {
     if (global.db) setInterval(async () => {
@@ -202,7 +215,7 @@ async function getGroupPicture(groupJid) {
     try {
         return await global.conn.profilePictureUrl(groupJid, 'image')
     } catch (e) {
-        return 'https://files.catbox.moe/z4qgf1.jpeg'
+        return 'https://files.catbox.moe/vb9zu1.jpg'
     }
 }
 
@@ -214,16 +227,13 @@ async function connectionUpdate(update) {
     if (isNewLogin) conn.isInit = true
     if (!global.db.data) loadDatabase()
 
-    if ((qr && qr !== '0') || methodCodeQR) {
-        if (opcion === '1' || methodCodeQR) {
-            console.log(chalk.bold.magenta(`\n❐ ESCANEA EL CÓDIGO QR - EXPIRA EN 45 SEGUNDOS`))
-        }
+    if (qr && qr !== '0' && opcion === '1') {
+        console.log(chalk.bold.magenta(`\n❐ ESCANEA EL CÓDIGO QR - EXPIRA EN 45 SEGUNDOS`))
     }
 
     if (connection === 'open') {
-        console.log(chalk.bold.magenta('\n🌸 αℓуα - вσт ᴄᴏɴᴇᴄᴛᴀᴅᴀ 🌸'))
-
-        const bio = `🌸 αℓуα - вσт | @Lyonn`
+        console.log(chalk.bold.magenta('\n🌸 Saki - вσт ᴄᴏɴᴇᴄᴛᴀᴅᴀ 🌸'))
+        const bio = `🌸 Saki - вσт | EL VIGILANTE`
         await global.conn.updateProfileStatus(bio).catch(() => {})
     }
 
@@ -266,17 +276,16 @@ let lastWelcomeEvent = {}
 global.conn.ev.on('group-participants.update', async (update) => {
     try {
         const { id, participants, action } = update
-        
-        // Crear una clave única para evitar duplicados (grupo + acción + lista de participantes)
+
         const eventKey = `${id}_${action}_${participants.sort().join(',')}`
         const now = Date.now()
-        
+
         if (lastWelcomeEvent[eventKey] && (now - lastWelcomeEvent[eventKey] < 2000)) {
             console.log('Evento duplicado ignorado')
             return
         }
         lastWelcomeEvent[eventKey] = now
-        
+
         if (!global.db.data) await loadDatabase()
         if (!global.db.data.chats[id]) global.db.data.chats[id] = {}
         const chat = global.db.data.chats[id]
@@ -290,23 +299,22 @@ global.conn.ev.on('group-participants.update', async (update) => {
         let groupIcon = await getGroupPicture(id)
 
         if (action === 'add') {
-            // Solo enviar un mensaje para todos los que se unieron
             const jids = participants
             const nombres = []
-            
+
             for (const jid of jids) {
                 if (!global.db.data.users[jid]) global.db.data.users[jid] = {}
                 nombres.push(`@${jid.split('@')[0]}`)
             }
-            
+
             let welcomeText = chat.welcomeMessage || `
-ㅤ    ꒰  ㅤ 🌸 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
+ㅤ    ꒰  ㅤ 🌸 ㅤ *Saki - вσт* ㅤ ⫏⫏  ꒱
 ㅤ    ⿻ ㅤ ✿ ㅤ вιєηνєηι∂@ 木 ✨ ㅤ 性
 
 > ₊· ⫏⫏ ㅤ 👤 ${nombres.join(', ')}
 > ₊· ⫏⫏ ㅤ 👥 Mɪᴇᴍʙʀᴏs: ${memberCount}
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
+ㅤ    ꒰  ㅤ ✿ ㅤ *Saki - вσт* ㅤ ⫏⫏ ꒱
 > ₊· ⫏⫏ ㅤ 🌟 Disfruta ${groupName}`
 
             await global.conn.sendMessage(id, {
@@ -327,19 +335,19 @@ global.conn.ev.on('group-participants.update', async (update) => {
         if (action === 'remove') {
             const jids = participants
             const nombres = []
-            
+
             for (const jid of jids) {
                 nombres.push(`@${jid.split('@')[0]}`)
             }
-            
+
             const goodbyeText = `
-ㅤ    ꒰  ㅤ 👋 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
+ㅤ    ꒰  ㅤ 👋 ㅤ *Saki - вσт* ㅤ ⫏⫏  ꒱
 ㅤ    ⿻ ㅤ ✿ ㅤ нαsтα 木 ρʀᴏɴтᴏ ㅤ 性
 
 > ₊· ⫏⫏ ㅤ 👤 ${nombres.join(', ')} нᴀɴ ᴀʙᴀɴᴅᴏɴᴀᴅᴏ
 > ₊· ⫏⫏ ㅤ 👥 Mɪᴇᴍʙʀᴏs ʀᴇsᴛᴀɴᴛᴇs: ${memberCount}
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱`
+ㅤ    ꒰  ㅤ ✿ ㅤ *Saki - вσт* ㅤ ⫏⫏ ꒱`
 
             await global.conn.sendMessage(id, {
                 image: { url: groupIcon },
@@ -347,14 +355,13 @@ global.conn.ev.on('group-participants.update', async (update) => {
                 mentions: jids
             })
         }
-        
-        // Limpiar eventos antiguos (más de 5 segundos)
+
         for (const key in lastWelcomeEvent) {
             if (Date.now() - lastWelcomeEvent[key] > 5000) {
                 delete lastWelcomeEvent[key]
             }
         }
-        
+
     } catch (e) { console.error('Error en group-participants:', e) }
 })
 
@@ -614,7 +621,7 @@ setInterval(async () => {
     await purgeOldFiles()
 }, 1000 * 60 * 10)
 
-_quickTest().then(() => conn.logger.info(chalk.bold.magenta(`🌸 αℓуα - вσт ʟɪsᴛᴀ ᴘᴀʀᴀ ᴜsᴀʀsᴇ 🌸\n`))).catch(console.error)
+_quickTest().then(() => conn.logger.info(chalk.bold.magenta(`🌸 Saki - вσт ʟɪsᴛᴀ ᴘᴀʀᴀ ᴜsᴀʀsᴇ 🌸\n`))).catch(console.error)
 
 let stopped
 
@@ -622,7 +629,7 @@ setInterval(async () => {
     if (stopped === 'close' || !conn || !conn?.user) return
     const _uptime = process.uptime() * 1000
     const uptime = clockString(_uptime)
-    const bio = `🌸 αℓуα - вσт | Activo: ${uptime}`
+    const bio = `🌸 Saki - вσт | Activo: ${uptime} | EL VIGILANTE`
     await conn?.updateProfileStatus(bio).catch(_ => _)
 }, 60000)
 
