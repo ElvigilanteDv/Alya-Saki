@@ -1,4 +1,4 @@
-// handler.js (completo y corregido)
+// handler.js - Saki Bot
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
 import { smsg } from '../lib/simple.js';
 import { format } from 'util';
@@ -15,7 +15,7 @@ const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(() => reso
 
 const dbPath = './src/database/aniadb.json';
 const newsletterJid = "120363407253203904@newsletter";
-const newsletterName = "αℓуα - ¢нαηηєℓ";
+const newsletterName = "Saki - ¢нαηηєℓ";
 
 export async function handler(chatUpdate) {
   this.msgqueque ||= [];
@@ -171,7 +171,7 @@ export async function handler(chatUpdate) {
     const isAdmin = isRAdmin || user.admin === 'admin';
     const isBotAdmin = !!bot.admin;
 
-    // ========== SISTEMA ANTILINK CON NEWSLETTER ==========
+    // ========== SISTEMA ANTILINK ==========
     if (m.isGroup && m.text && !m.isBaileys) {
       const chat = global.db.data.chats[m.chat];
 
@@ -220,30 +220,30 @@ export async function handler(chatUpdate) {
 
             await this.sendMessage(m.chat, {
               text: `
-ㅤ    ꒰  ㅤ 🔗 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ αηтιℓιηк 木 🛡️ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ *👤 Usuario:* @${m.sender.split('@')[0]}
-> ₊· ⫏⫏ ㅤ *🔗 Enlace:* ${linkEncontrado}
-> ₊· ⫏⫏ ㅤ *⚡ Acción:* Eliminado y expulsado
+𑁍𓂃 𓈒𓏸 *ANTILINK* 
+𑁍𓂃 𓈒𓏸 *USUARIO ::* @${m.sender.split('@')[0]}
+𑁍𓂃 𓈒𓏸 *ENLACE ::* ${linkEncontrado}
+𑁍𓂃 𓈒𓏸 *ACCIÓN ::* Eliminado y expulsado
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
               `.trim(),
               contextInfo: contextInfo
             });
           } else {
             await this.sendMessage(m.chat, {
               text: `
-ㅤ    ꒰  ㅤ 🔗 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ αηтιℓιηк 木 🛡️ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ *👤 Usuario:* @${m.sender.split('@')[0]}
-> ₊· ⫏⫏ ㅤ *🔗 Enlace:* ${linkEncontrado}
-> ₊· ⫏⫏ ㅤ *⚠️ Error:* El bot necesita ser admin
+𑁍𓂃 𓈒𓏸 *ANTILINK* 
+𑁍𓂃 𓈒𓏸 *USUARIO ::* @${m.sender.split('@')[0]}
+𑁍𓂃 𓈒𓏸 *ENLACE ::* ${linkEncontrado}
+𑁍𓂃 𓈒𓏸 *ERROR ::* El bot necesita ser admin
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
               `.trim(),
               contextInfo: contextInfo
             });
@@ -297,13 +297,13 @@ export async function handler(chatUpdate) {
         if (!['grupo-unbanchat.js', 'owner-exec.js', 'owner-exec2.js'].includes(name) && chat?.isBanned && !isROwner) return;
         if (m.text && user.banned && !isROwner) { 
           m.reply(`
-ㅤ    ꒰  ㅤ ❌ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ вαηєα∂σ 木 🚫 ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ *📌 Motivo:* ${user.bannedReason || 'Sin especificar'}
+𑁍𓂃 𓈒𓏸 *BANEADO* 
+𑁍𓂃 𓈒𓏸 *MOTIVO ::* ${user.bannedReason || 'Sin especificar'}
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
           `.trim());
           return;
         }
@@ -327,25 +327,27 @@ export async function handler(chatUpdate) {
         m.exp += xp;
         if (!isPrems && plugin.monedas && _user.USD < plugin.monedas) {
           this.reply(m.chat, `
-ㅤ    ꒰  ㅤ 💰 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ мσηє∂αѕ 木 ιηѕυƒι¢ιєηтєѕ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Necesitas ${plugin.monedas} USD
+𑁍𓂃 𓈒𓏸 *MONEDAS INSUFICIENTES* 
+𑁍𓂃 𓈒𓏸 *NECESITAS ::* ${plugin.monedas} USD
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
           `.trim(), m);
           continue;
         }
 
         if (plugin.level > _user.level) {
           this.reply(m.chat, `
-ㅤ    ꒰  ㅤ 📊 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ηινєℓ 木 ιηѕυƒι¢ιєηтє ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Necesitas nivel *${plugin.level}*
-> ₊· ⫏⫏ ㅤ Tu nivel actual: *${_user.level}*
+𑁍𓂃 𓈒𓏸 *NIVEL INSUFICIENTE* 
+𑁍𓂃 𓈒𓏸 *NECESITAS ::* Nivel ${plugin.level}
+𑁍𓂃 𓈒𓏸 *TU NIVEL ::* ${_user.level}
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
           `.trim(), m);
           continue;
         }
@@ -362,12 +364,13 @@ export async function handler(chatUpdate) {
         } finally {
           if (typeof plugin.after === 'function') await plugin.after.call(this, m, extra).catch(console.error);
           if (m.monedas) this.reply(m.chat, `
-ㅤ    ꒰  ㅤ 💰 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ gαѕтσ 木 мσηє∂αѕ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Usaste *${+m.monedas} USD*
+𑁍𓂃 𓈒𓏸 *GASTO* 
+𑁍𓂃 𓈒𓏸 *MONEDAS ::* ${+m.monedas} USD
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
           `.trim(), m);
         }
         break;
@@ -408,86 +411,86 @@ export async function handler(chatUpdate) {
 global.dfail = (type, m, conn, usedPrefix) => {
   const msg = {
     rowner: `
-ㅤ    ꒰  ㅤ 👑 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ α¢¢єѕσ 木 яєѕтяιηgι∂σ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Solo *el creador* puede usar esto
+𑁍𓂃 𓈒𓏸 *ACCESO RESTRINGIDO* 
+𑁍𓂃 𓈒𓏸 Solo *el creador* puede usar esto
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     owner: `
-ㅤ    ꒰  ㅤ 🔒 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ѕσℓσ 木 σωηєя ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Solo *el dueño del bot* puede usar esto
+𑁍𓂃 𓈒𓏸 *SOLO OWNER* 
+𑁍𓂃 𓈒𓏸 Solo *el dueño del bot* puede usar esto
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     premium: `
-ㅤ    ꒰  ㅤ 💎 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ρяємιυм 木 яєqυιєяє∂ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Solo para usuarios *Premium*
+𑁍𓂃 𓈒𓏸 *PREMIUM REQUERIDO* 
+𑁍𓂃 𓈒𓏸 Solo para usuarios *Premium*
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     private: `
-ㅤ    ꒰  ㅤ 🔒 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ρяινα∂σ 木 σηℓу ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Este comando solo funciona en privado
+𑁍𓂃 𓈒𓏸 *SOLO PRIVADO* 
+𑁍𓂃 𓈒𓏸 Este comando solo funciona en privado
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     group: `
-ㅤ    ꒰  ㅤ 👥 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ɢяυρσ 木 σηℓу ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Este comando solo funciona en grupos
+𑁍𓂃 𓈒𓏸 *SOLO GRUPOS* 
+𑁍𓂃 𓈒𓏸 Este comando solo funciona en grupos
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     admin: `
-ㅤ    ꒰  ㅤ 🛡️ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ α∂мιη 木 яєqυιяє∂ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Solo *administradores* pueden usar esto
+𑁍𓂃 𓈒𓏸 *SOLO ADMIN* 
+𑁍𓂃 𓈒𓏸 Solo *administradores* pueden usar esto
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     botAdmin: `
-ㅤ    ꒰  ㅤ 🤖 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ вσт 木 α∂мιη ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ El bot necesita ser *administrador* del grupo
+𑁍𓂃 𓈒𓏸 *BOT ADMIN* 
+𑁍𓂃 𓈒𓏸 El bot necesita ser *administrador* del grupo
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     unreg: `
-ㅤ    ꒰  ㅤ 📜 ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ ѕιη 木 яєgιѕтяαя ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Usa: *${usedPrefix || '#'}registrar <Nombre.Edad>*
-> ₊· ⫏⫏ ㅤ Ejemplo: *${usedPrefix || '#'}registrar Lyonn.17*
+𑁍𓂃 𓈒𓏸 *SIN REGISTRAR* 
+𑁍𓂃 𓈒𓏸 Usa: *${usedPrefix || '#'}registrar <Nombre.Edad>*
+𑁍𓂃 𓈒𓏸 Ejemplo: *${usedPrefix || '#'}registrar Saki.17*
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `,
     mods: `
-ㅤ    ꒰  ㅤ 🛡️ ㅤ *αℓуα - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ мσ∂ 木 σηℓу ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ Solo *moderadores* pueden usar esto
+𑁍𓂃 𓈒𓏸 *SOLO MODS* 
+𑁍𓂃 𓈒𓏸 Solo *moderadores* pueden usar esto
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *αℓуα - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🔖 Creador: Lʏᴏɴɴ
+> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
+> *Mano Derecha: Leo*
     `
   };
   if (msg[type]) return m.reply(msg[type]).then(() => m.react('❌'));
@@ -496,7 +499,7 @@ global.dfail = (type, m, conn, usedPrefix) => {
 let file = global.__filename(import.meta.url, true);
 watchFile(file, async () => {
   unwatchFile(file);
-  console.log(chalk.magenta("🔄 Se actualizó 'handler.js' de αℓуα - вσт"));
+  console.log(chalk.magenta("🔄 Se actualizó 'handler.js' de Saki - вσт"));
   if (global.conns && global.conns.length > 0) {
     const users = [...new Set([...global.conns.filter((conn) => conn.user && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED).map((conn) => conn)])];
     for (const userr of users) {
