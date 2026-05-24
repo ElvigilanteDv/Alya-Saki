@@ -63,17 +63,17 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let isDirectLink = query.includes('tiktok.com') || query.includes('vm.tiktok.com')
 
   try {
-    // Si no es enlace directo, buscar en TikTok
+    // Si no es enlace directo, buscar en TikTok usando search/tiktok
     if (!isDirectLink) {
       const searchUrl = `https://api-de-el-vigilante-8jnf.onrender.com/search/tiktok?query=${encodeURIComponent(query)}`
       const searchRes = await fetch(searchUrl)
       const searchData = await searchRes.json()
 
-      if (!searchData.status || !searchData.result?.length) {
+      if (!searchData.status || !searchData.data?.length) {
         throw new Error('No se encontraron resultados')
       }
 
-      const resultados = searchData.result.slice(0, 5)
+      const resultados = searchData.data.slice(0, 5)
 
       const rows = resultados.map((video, i) => ({
         header: `🎵 ${video.author?.nickname || 'Desconocido'}`,
@@ -113,18 +113,18 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       return
     }
 
-    // Si es enlace directo, procesar descarga inmediata
+    // Si es enlace directo, procesar descarga inmediata usando download/tiktok
     await m.reply(`⏳ *Procesando video de TikTok...*`)
 
     const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/tiktok?url=${encodeURIComponent(query)}`
     const response = await fetch(downloadUrl)
     const data = await response.json()
 
-    if (!data.status || !data.result?.video_url) {
+    if (!data.status || !data.data?.video_url) {
       throw new Error('No se pudo obtener el video')
     }
 
-    const { title, duration, video_url, cover_url } = data.result
+    const { title, duration, video_url, cover_url } = data.data
     const minutos = Math.floor(duration / 60)
     const segundos = duration % 60
     const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
@@ -164,7 +164,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             rows: [
               {
                 header: '📥 TOCA PARA DESCARGAR',
-                title: title?.substring(0, 35) || 'TikTok Video',
+                title: (title || 'TikTok Video').substring(0, 35),
                 description: `Duración: ${duracion}`,
                 id: `tt_download_${chatId}`
               }
@@ -207,7 +207,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   } catch (error) {
     console.error(error)
-    m.reply(`❌ Error al procesar el enlace o búsqueda. Verifica que sea válido.\n\n🔧 Si el error persiste, la API podría estar caída temporalmente.`)
+    m.reply(`❌ Error: ${error.message}`)
   }
 }
 
@@ -234,11 +234,11 @@ handler.before = async (m, { conn }) => {
       const response = await fetch(downloadUrl)
       const data = await response.json()
 
-      if (!data.status || !data.result?.video_url) {
+      if (!data.status || !data.data?.video_url) {
         throw new Error('No se pudo obtener el video')
       }
 
-      const { title, duration, video_url, cover_url } = data.result
+      const { title, duration, video_url, cover_url } = data.data
       const minutos = Math.floor(duration / 60)
       const segundos = duration % 60
       const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
@@ -365,7 +365,7 @@ handler.before = async (m, { conn }) => {
   }
 }
 
-handler.help = ['tiktok']
+handler.help = ['tiktok', 'tt']
 handler.tags = ['downloader']
 handler.command = ['tiktok', 'tt']
 
