@@ -37,161 +37,158 @@ const defaultMenu = {
 `
 }
 
-export default {
-  command: ['menu', 'menú', 'help'],
-  tags: ['main'],
-  register: false,
-  desc: 'Muestra el menú principal del bot con todas las categorías y comandos',
-  run: async (m, { conn, usedPrefix: _p }) => {
-    try {
-      let user = global.db.data.users[m.sender]
+let handler = async (m, { conn, usedPrefix: _p }) => {
+  try {
+    let user = global.db.data.users[m.sender]
 
-      if (!user) {
-        user = {
-          exp: 0,
-          level: 0
-        }
-        global.db.data.users[m.sender] = user
+    if (!user) {
+      user = { exp: 0, level: 0 }
+      global.db.data.users[m.sender] = user
+    }
+
+    const { exp, level } = user
+    const { min, xp } = xpRange(level, global.multiplier)
+    const name = await conn.getName(m.sender)
+
+    const help = Object.values(global.plugins)
+      .filter(p => !p.disabled)
+      .map(p => ({
+        help: Array.isArray(p.help) ? p.help : [p.help],
+        tags: Array.isArray(p.tags) ? p.tags : [p.tags],
+        prefix: 'customPrefix' in p,
+        desc: p.desc || ''
+      }))
+
+    let bannerFinal = 'https://files.catbox.moe/z2ij0x.jpeg'
+
+    let textoMenu = defaultMenu.before
+      .replace(/%time/g, new Date().toLocaleString())
+      .replace(/%totalcmd/g, Object.keys(global.plugins).length)
+      .replace(/%uptime/g, process.uptime().toFixed(0) + 's')
+
+    for (let tag of Object.keys(tags)) {
+      const cmds = help
+        .filter(menu => menu.tags?.includes(tag))
+        .map(menu => menu.help.map(h =>
+          defaultMenu.body
+            .replace(/%cmd/g, menu.prefix ? h : `${_p}${h}`)
+            + (menu.desc ? ` - ${menu.desc}` : '')
+        ).join('\n')).join('\n')
+
+      if (cmds) {
+        textoMenu += defaultMenu.header.replace(/%category/g, tags[tag])
+        textoMenu += '\n' + cmds
+        textoMenu += '\n' + defaultMenu.footer
       }
+    }
 
-      const { exp, level } = user
-      const { min, xp } = xpRange(level, global.multiplier)
-      const name = await conn.getName(m.sender)
+    textoMenu += defaultMenu.after
 
-      const help = Object.values(global.plugins)
-        .filter(p => !p.disabled)
-        .map(p => ({
-          help: Array.isArray(p.help) ? p.help : [p.help],
-          tags: Array.isArray(p.tags) ? p.tags : [p.tags],
-          prefix: 'customPrefix' in p,
-          desc: p.desc || ''
-        }))
+    const replace = {
+      name,
+      level,
+      exp: exp - min,
+      maxexp: xp,
+      totalreg: Object.keys(global.db.data.users).length,
+      readmore: readMore
+    }
 
-      let bannerFinal = 'https://files.catbox.moe/z2ij0x.jpeg'
+    let texto = textoMenu
 
-      let textoMenu = defaultMenu.before
-        .replace(/%time/g, new Date().toLocaleString())
-        .replace(/%totalcmd/g, Object.keys(global.plugins).length)
-        .replace(/%uptime/g, process.uptime().toFixed(0) + 's')
+    for (let key of Object.keys(replace)) {
+      texto = texto.replace(new RegExp(`%${key}`, 'g'), replace[key])
+    }
 
-      for (let tag of Object.keys(tags)) {
-        const cmds = help
-          .filter(menu => menu.tags?.includes(tag))
-          .map(menu => menu.help.map(h =>
-            defaultMenu.body
-              .replace(/%cmd/g, menu.prefix ? h : `${_p}${h}`)
-              + (menu.desc ? ` - ${menu.desc}` : '')
-          ).join('\n')).join('\n')
+    const {
+      generateWAMessageFromContent,
+      prepareWAMessageMedia,
+      proto
+    } = await import('@whiskeysockets/baileys')
 
-        if (cmds) {
-          textoMenu += defaultMenu.header.replace(/%category/g, tags[tag])
-          textoMenu += '\n' + cmds
-          textoMenu += '\n' + defaultMenu.footer
-        }
-      }
+    const media = await prepareWAMessageMedia(
+      { image: { url: bannerFinal } },
+      { upload: conn.waUploadToServer }
+    )
 
-      textoMenu += defaultMenu.after
-
-      const replace = {
-        name,
-        level,
-        exp: exp - min,
-        maxexp: xp,
-        totalreg: Object.keys(global.db.data.users).length,
-        readmore: readMore
-      }
-
-      let texto = textoMenu
-
-      for (let key of Object.keys(replace)) {
-        texto = texto.replace(
-          new RegExp(`%${key}`, 'g'),
-          replace[key]
-        )
-      }
-
-      const {
-        generateWAMessageFromContent,
-        prepareWAMessageMedia,
-        proto
-      } = await import('@whiskeysockets/baileys')
-
-      const media = await prepareWAMessageMedia(
-        { image: { url: bannerFinal } },
-        { upload: conn.waUploadToServer }
-      )
-
-      const interactiveMessage = proto.Message.InteractiveMessage.create({
-        header: {
-          title: 'YO OFC - вσт',
-          subtitle: 'Menú Principal',
-          hasMediaAttachment: true,
-          imageMessage: media.imageMessage
-        },
-        body: {
-          text: texto.trim()
-        },
-        footer: {
-          text: '⫏⫏ YO OFC - вσт ✿'
-        },
-        nativeFlowMessage: {
-          buttons: [{
-            name: 'single_select',
-            buttonParamsJson: JSON.stringify({
-              title: '📡 COMANDOS',
-              sections: [{
-                title: '☄️ SISTEMA',
-                rows: [{
-                  header: 'Estado',
-                  title: '📡 PING',
-                  description: 'Velocidad del bot',
-                  id: `${_p}ping`
-                }]
+    const interactiveMessage = proto.Message.InteractiveMessage.create({
+      header: {
+        title: 'YO OFC - вσт',
+        subtitle: 'Menú Principal',
+        hasMediaAttachment: true,
+        imageMessage: media.imageMessage
+      },
+      body: {
+        text: texto.trim()
+      },
+      footer: {
+        text: '⫏⫏ YO OFC - вσт ✿'
+      },
+      nativeFlowMessage: {
+        buttons: [{
+          name: 'single_select',
+          buttonParamsJson: JSON.stringify({
+            title: '📡 COMANDOS',
+            sections: [{
+              title: '☄️ SISTEMA',
+              rows: [{
+                header: 'Estado',
+                title: '📡 PING',
+                description: 'Velocidad del bot',
+                id: `${_p}ping`
               }]
-            })
-          }]
-        }
-      })
+            }]
+          })
+        }]
+      }
+    })
 
-      const msg = generateWAMessageFromContent(
-        m.chat,
-        {
-          viewOnceMessage: {
-            message: {
-              messageContextInfo: {},
-              interactiveMessage
-            }
+    const msg = generateWAMessageFromContent(
+      m.chat,
+      {
+        viewOnceMessage: {
+          message: {
+            messageContextInfo: {},
+            interactiveMessage
           }
-        },
-        { quoted: m }
-      )
+        }
+      },
+      { quoted: m }
+    )
 
-      await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
-      await m.react('🕸️')
+    await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
+    await m.react('🕸️')
 
-    } catch (e) {
-      console.log(e)
-      await conn.sendMessage(m.chat, { text: `❌ Error:\n${e}` }, { quoted: m })
-    }
-  },
-  before: async (m, { conn }) => {
-    const nativeFlow = m.message?.interactiveResponseMessage?.nativeFlowResponseMessage
-    if (!nativeFlow) return false
+  } catch (e) {
+    console.log(e)
+    await conn.sendMessage(m.chat, { text: `❌ Error:\n${e}` }, { quoted: m })
+  }
+}
 
-    try {
-      const data = JSON.parse(nativeFlow.paramsJson || '{}')
-      const id = data.id || data.selectedId || data.selectedRowId || null
-      if (!id) return false
+handler.before = async (m, { conn }) => {
+  const nativeFlow = m.message?.interactiveResponseMessage?.nativeFlowResponseMessage
+  if (!nativeFlow) return false
 
-      m.text = id
-      m.body = id
-    } catch (e) {
-      console.log(e)
-    }
+  try {
+    const data = JSON.parse(nativeFlow.paramsJson || '{}')
+    const id = data.id || data.selectedId || data.selectedRowId || null
+    if (!id) return false
 
+    m.text = id
+    m.body = id
+    return false
+  } catch (e) {
+    console.log(e)
     return false
   }
 }
+
+handler.help = ['menu', 'menú', 'help']
+handler.tags = ['main']
+handler.command = ['menu', 'menú', 'help']
+handler.register = false
+handler.desc = 'Muestra el menú principal del bot'
+
+export default handler
 
 const more = String.fromCharCode(8206)
 const readMore = more.repeat(4001)
