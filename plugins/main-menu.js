@@ -2,6 +2,11 @@ import fs from 'fs'
 import path, { join } from 'path'
 import fetch from 'node-fetch'
 import { xpRange } from '../lib/levelling.js'
+import {
+  generateWAMessageFromContent,
+  prepareWAMessageMedia,
+  proto
+} from '@whiskeysockets/baileys'
 
 const tags = {
   main: 'ρяιη¢ιραℓ',
@@ -99,12 +104,6 @@ let handler = async (m, { conn, usedPrefix: _p }) => {
       texto = texto.replace(new RegExp(`%${key}`, 'g'), replace[key])
     }
 
-    const {
-      generateWAMessageFromContent,
-      prepareWAMessageMedia,
-      proto
-    } = await import('@whiskeysockets/baileys')
-
     const media = await prepareWAMessageMedia(
       { image: { url: bannerFinal } },
       { upload: conn.waUploadToServer }
@@ -134,7 +133,7 @@ let handler = async (m, { conn, usedPrefix: _p }) => {
                 header: 'Estado',
                 title: '📡 PING',
                 description: 'Velocidad del bot',
-                id: `${_p}ping`
+                id: 'ping'
               }]
             }]
           })
@@ -171,14 +170,40 @@ handler.before = async (m, { conn }) => {
   try {
     const data = JSON.parse(nativeFlow.paramsJson || '{}')
     const id = data.id || data.selectedId || data.selectedRowId || null
+
     if (!id) return false
 
-    m.text = id
+    // Buscar el plugin que tenga ese comando igual que play busca audio_
+    const plugin = Object.values(global.plugins).find(p => {
+      if (p.disabled) return false
+      const cmds = Array.isArray(p.command) ? p.command : [p.command]
+      return cmds.includes(id)
+    })
+
+    if (!plugin) return false
+
+    await m.react('⏳')
+
+    m.text = ''
     m.body = id
-    return false
+
+    await plugin(m, {
+      conn,
+      text: '',
+      usedPrefix: '!',
+      command: id,
+      args: [],
+      v: m
+    })
+
+    await m.react('✅')
+    return true
+
   } catch (e) {
-    console.log(e)
-    return false
+    console.log('[MENU ERROR]', e)
+    await conn.sendMessage(m.chat, { text: `❌ Error: ${e.message}` }, { quoted: m })
+    await m.react('❌')
+    return true
   }
 }
 
