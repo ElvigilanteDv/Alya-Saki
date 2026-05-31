@@ -247,7 +247,6 @@ handler.before = async (m, { conn }) => {
 
     if (!id) return false
 
-    // Manejar selección de búsqueda
     if (id.startsWith('video_') && !id.startsWith('video_download_')) {
       const parts = id.split('_')
       const urlBase64 = parts[2]
@@ -352,7 +351,6 @@ handler.before = async (m, { conn }) => {
       return true
     }
 
-    // Manejar descarga directa
     if (id.startsWith('video_download_')) {
       const chatId = id.replace('video_download_', '')
       const pendiente = pendientes[chatId]
@@ -374,7 +372,7 @@ handler.before = async (m, { conn }) => {
       fs.writeFileSync(videoPath, videoBuffer)
 
       await conn.sendMessage(m.chat, {
-        video: fs.readFileSync(videoPath),
+        document: fs.readFileSync(videoPath),
         mimetype: 'video/mp4',
         fileName: `${pendiente.title}.mp4`
       }, { quoted: m })
