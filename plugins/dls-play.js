@@ -7,53 +7,58 @@ import {
   proto
 } from '@whiskeysockets/baileys'
 
-const API_KEY = 'dvyer639369687037'
-const API_BASE = 'https://dv-yer-api.online'
-
 let pendientes = {}
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
   if (!text) {
-    const buttons = {
-      name: 'single_select',
-      buttonParamsJson: JSON.stringify({
-        title: '🎵 YTMP3',
-        sections: [
-          {
-            title: '🔗 ENLACE O BÚSQUEDA',
-            rows: [
-              {
-                header: '📥 DESCARGA DIRECTA',
-                title: '🎵 PEGAR LINK O NOMBRE',
-                description: 'Ejemplo: https://youtu.be/... o Bad Bunny',
-                id: `${usedPrefix}play `
-              }
-            ]
-          }
-        ]
-      })
-    }
-
     const interactiveMessage = proto.Message.InteractiveMessage.create({
-      header: { title: 'YO OFC - ѕυв', subtitle: 'Youtube a Mp3', hasMediaAttachment: false },
-      body: { text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+      header: {
+        title: 'YO OFC - PLAY',
+        subtitle: 'Youtube a Mp3',
+        hasMediaAttachment: false
+      },
+      body: {
+        text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
 𑁍𓂃 𓈒𓏸 *COMANDO ::* ${usedPrefix + command}
 𑁍𓂃 𓈒𓏸 *USO ::* Envía un enlace de YouTube o una búsqueda
 
-> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა` },
-      footer: { text: '⫏⫏ YO OFC - вσт ✿' },
-      nativeFlowMessage: { buttons: [buttons] }
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
+      },
+      footer: {
+        text: '⫏⫏ YO OFC - вσт ✿'
+      },
+      nativeFlowMessage: {
+        buttons: [{
+          name: 'single_select',
+          buttonParamsJson: JSON.stringify({
+            title: '🎵 YTMP3',
+            sections: [{
+              title: '🔗 ENLACE O BÚSQUEDA',
+              rows: [{
+                header: '📥 DESCARGA DIRECTA',
+                title: '🎵 PEGAR LINK O NOMBRE',
+                description: 'Ejemplo: https://youtu.be/... o Paulo Londra',
+                id: `play `
+              }]
+            }]
+          })
+        }]
+      }
     })
 
-    const msg = generateWAMessageFromContent(m.chat, {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {},
-          interactiveMessage
+    const msg = generateWAMessageFromContent(
+      m.chat,
+      {
+        viewOnceMessage: {
+          message: {
+            messageContextInfo: {},
+            interactiveMessage
+          }
         }
-      }
-    }, { quoted: m })
+      },
+      { quoted: m }
+    )
 
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
     return
@@ -65,36 +70,41 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let isDirectLink = query.includes('youtu.be') || query.includes('youtube.com')
 
   try {
-    
     if (!isDirectLink) {
-      const searchRes = await fetch(`${API_BASE}/ytsearch`, {
-        method: 'POST',
-        headers: {
-          'x-api-key': API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query: query })
-      })
-
+      const searchUrl = `https://api-de-el-vigilante-8jnf.onrender.com/search/youtube?q=${encodeURIComponent(query)}`
+      const searchRes = await fetch(searchUrl)
       const searchData = await searchRes.json()
 
-      if (!searchData.ok || !searchData.results?.length) {
+      if (!searchData.status || !searchData.result?.length) {
         throw new Error('No se encontraron resultados')
       }
 
-      const resultados = searchData.results.slice(0, 5)
+      const resultados = searchData.result.slice(0, 5)
 
       const rows = resultados.map((video, i) => ({
         header: `🎵 ${video.channel || 'Desconocido'}`,
         title: video.title.substring(0, 35),
-        description: `⏱️ ${Math.floor(video.duration_seconds / 60)}:${(video.duration_seconds % 60).toString().padStart(2, '0')} | 👁️ ${video.views || '?'}`,
+        description: `⏱️ ${video.duration || '?'} | 👁️ ${video.views || '?'}`,
         id: `audio_${i}_${Buffer.from(video.url).toString('base64')}_${Buffer.from(video.title).toString('base64')}`
       }))
 
       const interactiveMessage = proto.Message.InteractiveMessage.create({
-        header: { title: 'YO OFC - ѕυв', subtitle: 'Selecciona una canción', hasMediaAttachment: false },
-        body: { text: `🎵 *${query}*\n\nSe encontraron ${resultados.length} resultados. Selecciona una:` },
-        footer: { text: '⫏⫏ YO OFC - вσт ✿' },
+        header: {
+          title: 'YO OFC - PLAY',
+          subtitle: 'Selecciona una canción',
+          hasMediaAttachment: false
+        },
+        body: {
+          text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+
+𑁍𓂃 𓈒𓏸 *BÚSQUEDA ::* ${query}
+𑁍𓂃 𓈒𓏸 *RESULTADOS ::* ${resultados.length}
+
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
+        },
+        footer: {
+          text: '⫏⫏ YO OFC - вσт ✿'
+        },
         nativeFlowMessage: {
           buttons: [{
             name: 'single_select',
@@ -102,52 +112,47 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
               title: '🎵 VER RESULTADOS',
               sections: [{
                 title: '📋 SELECCIONA UNA CANCIÓN',
-                rows: rows
+                rows
               }]
             })
           }]
         }
       })
 
-      const msg = generateWAMessageFromContent(m.chat, {
-        viewOnceMessage: {
-          message: {
-            messageContextInfo: {},
-            interactiveMessage
+      const msg = generateWAMessageFromContent(
+        m.chat,
+        {
+          viewOnceMessage: {
+            message: {
+              messageContextInfo: {},
+              interactiveMessage
+            }
           }
-        }
-      }, { quoted: m })
+        },
+        { quoted: m }
+      )
 
       await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
       return
     }
 
-    
-    await m.reply(`⏳ *Procesando audio...*`)
+    await conn.sendMessage(m.chat, { text: '⏳ *Procesando audio...*' }, { quoted: m })
 
-    const downloadRes = await fetch(`${API_BASE}/ytmp3?url=${encodeURIComponent(query)}`, {
-      method: 'GET',
-      headers: {
-        'x-api-key': API_KEY
-      }
-    })
+    const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytaudio?url=${encodeURIComponent(query)}`
+    const response = await fetch(downloadUrl)
+    const data = await response.json()
 
-    const data = await downloadRes.json()
-
-    if (!data.ok || !data.download_url) {
+    if (!data.status || !data.result?.download_url) {
       throw new Error('No se pudo obtener el audio')
     }
 
-    const { title, duration_seconds, thumbnail, download_url } = data
-    const minutos = Math.floor(duration_seconds / 60)
-    const segundos = duration_seconds % 60
+    const { title, duration, thumbnail, download_url } = data.result
+    const minutos = Math.floor(duration / 60)
+    const segundos = duration % 60
     const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
 
     const chatId = m.chat
-    pendientes[chatId] = {
-      url: download_url,
-      title: title
-    }
+    pendientes[chatId] = { url: download_url, title }
 
     setTimeout(() => {
       if (pendientes[chatId]) delete pendientes[chatId]
@@ -163,64 +168,72 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       if (thumbRes.ok) {
         const thumbBuffer = await thumbRes.buffer()
         fs.writeFileSync(thumbPath, thumbBuffer)
-        media = await prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
+        media = await prepareWAMessageMedia(
+          { image: fs.readFileSync(thumbPath) },
+          { upload: conn.waUploadToServer }
+        )
         fs.unlinkSync(thumbPath)
       }
     }
 
-    const buttons = {
-      name: 'single_select',
-      buttonParamsJson: JSON.stringify({
-        title: '🎵 DESCARGAR',
-        sections: [
-          {
-            title: '✅ CANCIÓN ENCONTRADA',
-            rows: [
-              {
-                header: '📥 TOCA PARA DESCARGAR',
-                title: title.substring(0, 35),
-                description: `Duración: ${duracion}`,
-                id: `audio_download_${chatId}`
-              }
-            ]
-          }
-        ]
-      })
-    }
-
     const interactiveMessage = proto.Message.InteractiveMessage.create({
       header: {
-        title: 'YO OFC - ѕυв',
+        title: 'YO OFC - PLAY',
         subtitle: 'Youtube a Mp3',
         hasMediaAttachment: !!media,
         imageMessage: media ? media.imageMessage : undefined
       },
-      body: { text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+      body: {
+        text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
 𑁍𓂃 𓈒𓏸 *TÍTULO ::* ${title}
 𑁍𓂃 𓈒𓏸 *DURACIÓN ::* ${duracion}
 
 > *Toca el botón para descargar*
 
-> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა` },
-      footer: { text: '⫏⫏ YO OFC - вσт ✿' },
-      nativeFlowMessage: { buttons: [buttons] }
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
+      },
+      footer: {
+        text: '⫏⫏ YO OFC - вσт ✿'
+      },
+      nativeFlowMessage: {
+        buttons: [{
+          name: 'single_select',
+          buttonParamsJson: JSON.stringify({
+            title: '🎵 DESCARGAR',
+            sections: [{
+              title: '✅ CANCIÓN ENCONTRADA',
+              rows: [{
+                header: '📥 TOCA PARA DESCARGAR',
+                title: title.substring(0, 35),
+                description: `Duración: ${duracion}`,
+                id: `audio_download_${chatId}`
+              }]
+            }]
+          })
+        }]
+      }
     })
 
-    const msg = generateWAMessageFromContent(m.chat, {
-      viewOnceMessage: {
-        message: {
-          messageContextInfo: {},
-          interactiveMessage
+    const msg = generateWAMessageFromContent(
+      m.chat,
+      {
+        viewOnceMessage: {
+          message: {
+            messageContextInfo: {},
+            interactiveMessage
+          }
         }
-      }
-    }, { quoted: m })
+      },
+      { quoted: m }
+    )
 
     await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
 
   } catch (error) {
     console.error(error)
-    m.reply(`❌ Error: ${error.message || 'No se pudo procesar'}`)
+    await m.react('❌')
+    m.reply(`❌ Error al procesar. Verifica que sea válido.`)
   }
 }
 
@@ -232,8 +245,10 @@ handler.before = async (m, { conn }) => {
     const data = JSON.parse(nativeFlow.paramsJson || '{}')
     const id = data.id || data.selectedId || data.selectedRowId || null
 
+    if (!id) return false
+
     // Manejar selección de búsqueda
-    if (id && id.startsWith('audio_') && !id.includes('download')) {
+    if (id.startsWith('audio_') && !id.startsWith('audio_download_')) {
       const parts = id.split('_')
       const urlBase64 = parts[2]
       const titleBase64 = parts[3]
@@ -243,27 +258,21 @@ handler.before = async (m, { conn }) => {
       await m.react('⏳')
       await conn.sendMessage(m.chat, { text: `⏳ *Obteniendo audio: ${videoTitle.substring(0, 40)}...*` }, { quoted: m })
 
-      const downloadRes = await fetch(`${API_BASE}/ytmp3?url=${encodeURIComponent(videoUrl)}`, {
-        method: 'GET',
-        headers: { 'x-api-key': API_KEY }
-      })
+      const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytaudio?url=${encodeURIComponent(videoUrl)}`
+      const response = await fetch(downloadUrl)
+      const result = await response.json()
 
-      const data = await downloadRes.json()
-
-      if (!data.ok || !data.download_url) {
+      if (!result.status || !result.result?.download_url) {
         throw new Error('No se pudo obtener el audio')
       }
 
-      const { title, duration_seconds, thumbnail, download_url } = data
-      const minutos = Math.floor(duration_seconds / 60)
-      const segundos = duration_seconds % 60
+      const { title, duration, thumbnail, download_url } = result.result
+      const minutos = Math.floor(duration / 60)
+      const segundos = duration % 60
       const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
 
       const chatId = m.chat
-      pendientes[chatId] = {
-        url: download_url,
-        title: title
-      }
+      pendientes[chatId] = { url: download_url, title }
 
       setTimeout(() => {
         if (pendientes[chatId]) delete pendientes[chatId]
@@ -279,65 +288,72 @@ handler.before = async (m, { conn }) => {
         if (thumbRes.ok) {
           const thumbBuffer = await thumbRes.buffer()
           fs.writeFileSync(thumbPath, thumbBuffer)
-          media = await prepareWAMessageMedia({ image: fs.readFileSync(thumbPath) }, { upload: conn.waUploadToServer })
+          media = await prepareWAMessageMedia(
+            { image: fs.readFileSync(thumbPath) },
+            { upload: conn.waUploadToServer }
+          )
           fs.unlinkSync(thumbPath)
         }
       }
 
-      const buttons = {
-        name: 'single_select',
-        buttonParamsJson: JSON.stringify({
-          title: '🎵 DESCARGAR',
-          sections: [
-            {
-              title: '✅ CANCIÓN ENCONTRADA',
-              rows: [
-                {
-                  header: '📥 TOCA PARA DESCARGAR',
-                  title: title.substring(0, 35),
-                  description: `Duración: ${duracion}`,
-                  id: `audio_download_${chatId}`
-                }
-              ]
-            }
-          ]
-        })
-      }
-
       const interactiveMessage = proto.Message.InteractiveMessage.create({
         header: {
-          title: 'YO OFC - ѕυв',
+          title: 'YO OFC - PLAY',
           subtitle: 'Youtube a Mp3',
           hasMediaAttachment: !!media,
           imageMessage: media ? media.imageMessage : undefined
         },
-        body: { text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+        body: {
+          text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
 𑁍𓂃 𓈒𓏸 *TÍTULO ::* ${title}
 𑁍𓂃 𓈒𓏸 *DURACIÓN ::* ${duracion}
 
 > *Toca el botón para descargar*
 
-> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა` },
-        footer: { text: '⫏⫏ YO OFC - вσт ✿' },
-        nativeFlowMessage: { buttons: [buttons] }
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
+        },
+        footer: {
+          text: '⫏⫏ YO OFC - вσт ✿'
+        },
+        nativeFlowMessage: {
+          buttons: [{
+            name: 'single_select',
+            buttonParamsJson: JSON.stringify({
+              title: '🎵 DESCARGAR',
+              sections: [{
+                title: '✅ CANCIÓN ENCONTRADA',
+                rows: [{
+                  header: '📥 TOCA PARA DESCARGAR',
+                  title: title.substring(0, 35),
+                  description: `Duración: ${duracion}`,
+                  id: `audio_download_${chatId}`
+                }]
+              }]
+            })
+          }]
+        }
       })
 
-      const msg = generateWAMessageFromContent(m.chat, {
-        viewOnceMessage: {
-          message: {
-            messageContextInfo: {},
-            interactiveMessage
+      const msg = generateWAMessageFromContent(
+        m.chat,
+        {
+          viewOnceMessage: {
+            message: {
+              messageContextInfo: {},
+              interactiveMessage
+            }
           }
-        }
-      }, { quoted: m })
+        },
+        { quoted: m }
+      )
 
       await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id })
       return true
     }
 
     // Manejar descarga directa
-    if (id && id.startsWith('audio_download_')) {
+    if (id.startsWith('audio_download_')) {
       const chatId = id.replace('audio_download_', '')
       const pendiente = pendientes[chatId]
 
