@@ -7,6 +7,9 @@ import {
   proto
 } from '@whiskeysockets/baileys'
 
+const API_KEY = 'dvyer639369687037'
+const API_BASE = 'https://dv-yer-api.online'
+
 let pendientes = {}
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
@@ -22,7 +25,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
               {
                 header: '📥 DESCARGA DIRECTA',
                 title: '🎵 PEGAR LINK O NOMBRE',
-                description: 'Ejemplo: https://youtu.be/... o Paulo Londra',
+                description: 'Ejemplo: https://youtu.be/... o Bad Bunny',
                 id: `${usedPrefix}play `
               }
             ]
@@ -32,15 +35,14 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     const interactiveMessage = proto.Message.InteractiveMessage.create({
-      header: { title: 'Saki - ѕυв', subtitle: 'Youtube a Mp3', hasMediaAttachment: false },
+      header: { title: 'YO OFC - ѕυв', subtitle: 'Youtube a Mp3', hasMediaAttachment: false },
       body: { text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
 𑁍𓂃 𓈒𓏸 *COMANDO ::* ${usedPrefix + command}
 𑁍𓂃 𓈒𓏸 *USO ::* Envía un enlace de YouTube o una búsqueda
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*` },
-      footer: { text: '⫏⫏ Saki - вσт ✿' },
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა` },
+      footer: { text: '⫏⫏ YO OFC - вσт ✿' },
       nativeFlowMessage: { buttons: [buttons] }
     })
 
@@ -63,37 +65,36 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let isDirectLink = query.includes('youtu.be') || query.includes('youtube.com')
 
   try {
-    // Si no es enlace directo, buscar en YouTube usando tu API de búsqueda
+    
     if (!isDirectLink) {
-      const searchUrl = `https://api-de-el-vigilante-8jnf.onrender.com/search/youtube?q=${encodeURIComponent(query)}`
-      const searchRes = await fetch(searchUrl)
+      const searchRes = await fetch(`${API_BASE}/ytsearch`, {
+        method: 'POST',
+        headers: {
+          'x-api-key': API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query: query })
+      })
+
       const searchData = await searchRes.json()
 
-      if (!searchData.status || !searchData.result?.length) {
+      if (!searchData.ok || !searchData.results?.length) {
         throw new Error('No se encontraron resultados')
       }
 
-      // Filtrar solo música (puedes ajustar el filtro)
-      const musicResults = searchData.result.filter(video => 
-        video.title.toLowerCase().includes('video oficial') || 
-        video.title.toLowerCase().includes('ft') ||
-        video.title.toLowerCase().includes('remix') ||
-        video.duration && (parseInt(video.duration.split(':')[0]) < 10)
-      ).slice(0, 5)
-
-      const resultados = musicResults.length > 0 ? musicResults.slice(0, 5) : searchData.result.slice(0, 5)
+      const resultados = searchData.results.slice(0, 5)
 
       const rows = resultados.map((video, i) => ({
         header: `🎵 ${video.channel || 'Desconocido'}`,
         title: video.title.substring(0, 35),
-        description: `⏱️ ${video.duration || '?'} | 👁️ ${video.views || '?'}`,
+        description: `⏱️ ${Math.floor(video.duration_seconds / 60)}:${(video.duration_seconds % 60).toString().padStart(2, '0')} | 👁️ ${video.views || '?'}`,
         id: `audio_${i}_${Buffer.from(video.url).toString('base64')}_${Buffer.from(video.title).toString('base64')}`
       }))
 
       const interactiveMessage = proto.Message.InteractiveMessage.create({
-        header: { title: 'Saki - ѕυв', subtitle: 'Selecciona una canción', hasMediaAttachment: false },
+        header: { title: 'YO OFC - ѕυв', subtitle: 'Selecciona una canción', hasMediaAttachment: false },
         body: { text: `🎵 *${query}*\n\nSe encontraron ${resultados.length} resultados. Selecciona una:` },
-        footer: { text: '⫏⫏ Saki - вσт ✿' },
+        footer: { text: '⫏⫏ YO OFC - вσт ✿' },
         nativeFlowMessage: {
           buttons: [{
             name: 'single_select',
@@ -121,20 +122,25 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
       return
     }
 
-    // Si es enlace directo, procesar descarga inmediata
+    
     await m.reply(`⏳ *Procesando audio...*`)
 
-    const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytaudio?url=${encodeURIComponent(query)}`
-    const response = await fetch(downloadUrl)
-    const data = await response.json()
+    const downloadRes = await fetch(`${API_BASE}/ytmp3?url=${encodeURIComponent(query)}`, {
+      method: 'GET',
+      headers: {
+        'x-api-key': API_KEY
+      }
+    })
 
-    if (!data.status || !data.result?.download_url) {
+    const data = await downloadRes.json()
+
+    if (!data.ok || !data.download_url) {
       throw new Error('No se pudo obtener el audio')
     }
 
-    const { title, duration, thumbnail, download_url } = data.result
-    const minutos = Math.floor(duration / 60)
-    const segundos = duration % 60
+    const { title, duration_seconds, thumbnail, download_url } = data
+    const minutos = Math.floor(duration_seconds / 60)
+    const segundos = duration_seconds % 60
     const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
 
     const chatId = m.chat
@@ -184,7 +190,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const interactiveMessage = proto.Message.InteractiveMessage.create({
       header: {
-        title: 'Saki - ѕυв',
+        title: 'YO OFC - ѕυв',
         subtitle: 'Youtube a Mp3',
         hasMediaAttachment: !!media,
         imageMessage: media ? media.imageMessage : undefined
@@ -196,9 +202,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
 > *Toca el botón para descargar*
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*` },
-      footer: { text: '⫏⫏ Saki - вσт ✿' },
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა` },
+      footer: { text: '⫏⫏ YO OFC - вσт ✿' },
       nativeFlowMessage: { buttons: [buttons] }
     })
 
@@ -215,7 +220,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   } catch (error) {
     console.error(error)
-    m.reply(`❌ Error al procesar el enlace o búsqueda. Verifica que sea válido.`)
+    m.reply(`❌ Error: ${error.message || 'No se pudo procesar'}`)
   }
 }
 
@@ -238,17 +243,20 @@ handler.before = async (m, { conn }) => {
       await m.react('⏳')
       await conn.sendMessage(m.chat, { text: `⏳ *Obteniendo audio: ${videoTitle.substring(0, 40)}...*` }, { quoted: m })
 
-      const downloadUrl = `https://api-de-el-vigilante-8jnf.onrender.com/download/ytaudio?url=${encodeURIComponent(videoUrl)}`
-      const response = await fetch(downloadUrl)
-      const data = await response.json()
+      const downloadRes = await fetch(`${API_BASE}/ytmp3?url=${encodeURIComponent(videoUrl)}`, {
+        method: 'GET',
+        headers: { 'x-api-key': API_KEY }
+      })
 
-      if (!data.status || !data.result?.download_url) {
+      const data = await downloadRes.json()
+
+      if (!data.ok || !data.download_url) {
         throw new Error('No se pudo obtener el audio')
       }
 
-      const { title, duration, thumbnail, download_url } = data.result
-      const minutos = Math.floor(duration / 60)
-      const segundos = duration % 60
+      const { title, duration_seconds, thumbnail, download_url } = data
+      const minutos = Math.floor(duration_seconds / 60)
+      const segundos = duration_seconds % 60
       const duracion = `${minutos}:${segundos.toString().padStart(2, '0')}`
 
       const chatId = m.chat
@@ -298,7 +306,7 @@ handler.before = async (m, { conn }) => {
 
       const interactiveMessage = proto.Message.InteractiveMessage.create({
         header: {
-          title: 'Saki - ѕυв',
+          title: 'YO OFC - ѕυв',
           subtitle: 'Youtube a Mp3',
           hasMediaAttachment: !!media,
           imageMessage: media ? media.imageMessage : undefined
@@ -310,9 +318,8 @@ handler.before = async (m, { conn }) => {
 
 > *Toca el botón para descargar*
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*` },
-        footer: { text: '⫏⫏ Saki - вσт ✿' },
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა` },
+        footer: { text: '⫏⫏ YO OFC - вσт ✿' },
         nativeFlowMessage: { buttons: [buttons] }
       })
 
@@ -366,7 +373,7 @@ handler.before = async (m, { conn }) => {
 
   } catch (e) {
     console.error(e)
-    await conn.sendMessage(m.chat, { text: `❌ Error al procesar: ${e.message}` }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: `❌ Error: ${e.message}` }, { quoted: m })
     await m.react('❌')
     return true
   }
