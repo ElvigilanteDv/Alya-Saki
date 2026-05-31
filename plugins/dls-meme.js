@@ -21,7 +21,6 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     const { titulo, imagen, fuente, descargar } = data
 
-    // Descargar la imagen del meme
     const imgRes = await fetch(imagen)
     const imgBuffer = await imgRes.buffer()
 
@@ -38,32 +37,6 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     fs.unlinkSync(imgPath)
 
-    const buttons = {
-      name: 'single_select',
-      buttonParamsJson: JSON.stringify({
-        title: '😂 MEME',
-        sections: [
-          {
-            title: '📋 OPCIONES',
-            rows: [
-              {
-                header: '📥 DESCARGA DIRECTA',
-                title: '⬇️ DESCARGAR MEME',
-                description: 'Toca para descargar la imagen',
-                id: `${usedPrefix}descargarmeme ${descargar}`
-              },
-              {
-                header: '🔄 OTRO MEME',
-                title: '🎲 MEME ALEATORIO',
-                description: 'Generar otro meme',
-                id: `${usedPrefix}${command}`
-              }
-            ]
-          }
-        ]
-      })
-    }
-
     const interactiveMessage = proto.Message.InteractiveMessage.create({
       header: {
         title: 'YO OFC - MEME',
@@ -74,16 +47,40 @@ let handler = async (m, { conn, usedPrefix, command }) => {
       body: {
         text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *TÍTULO* : ${titulo || 'Sin título'}
-𑁍𓂃 𓈒𓏸 *FUENTE* : ${fuente || 'Memedroid'}
-𑁍𓂃 𓈒𓏸 *IDIOMA* : ${data.idioma || 'Español'}
+𑁍𓂃 𓈒𓏸 *TÍTULO ::* ${titulo || 'Sin título'}
+𑁍𓂃 𓈒𓏸 *FUENTE ::* ${fuente || 'Memedroid'}
+𑁍𓂃 𓈒𓏸 *IDIOMA ::* ${data.idioma || 'Español'}
 
 > *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
       },
       footer: {
         text: '⫏⫏ YO OFC - вσт ✿'
       },
-      nativeFlowMessage: { buttons: [buttons] }
+      nativeFlowMessage: {
+        buttons: [{
+          name: 'single_select',
+          buttonParamsJson: JSON.stringify({
+            title: '😂 MEME',
+            sections: [{
+              title: '📋 OPCIONES',
+              rows: [
+                {
+                  header: '📥 DESCARGA',
+                  title: '⬇️ DESCARGAR MEME',
+                  description: 'Toca para descargar la imagen',
+                  id: `descargarmeme_${descargar}`
+                },
+                {
+                  header: '🔄 OTRO',
+                  title: '🎲 MEME ALEATORIO',
+                  description: 'Generar otro meme',
+                  id: 'meme'
+                }
+              ]
+            }]
+          })
+        }]
+      }
     })
 
     const msg = generateWAMessageFromContent(
@@ -106,6 +103,74 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     console.error(error)
     await m.react('❌')
     await conn.sendMessage(m.chat, { text: `❌ Error: ${error.message}` }, { quoted: m })
+  }
+}
+
+handler.before = async (m, { conn }) => {
+  const nativeFlow = m.message?.interactiveResponseMessage?.nativeFlowResponseMessage
+  if (!nativeFlow) return false
+
+  try {
+    const data = JSON.parse(nativeFlow.paramsJson || '{}')
+    const id = data.id || data.selectedId || data.selectedRowId || null
+
+    if (!id) return false
+
+    // Manejar descarga del meme
+    if (id.startsWith('descargarmeme_')) {
+      const url = id.replace('descargarmeme_', '')
+
+      await m.react('⏳')
+      await conn.sendMessage(m.chat, { text: '⏳ *Descargando meme...*' }, { quoted: m })
+
+      const tmpDir = path.join(process.cwd(), 'tmp')
+      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+
+      const imgRes = await fetch(url)
+      const imgBuffer = await imgRes.buffer()
+      const imgPath = path.join(tmpDir, `meme_dl_${Date.now()}.jpg`)
+      fs.writeFileSync(imgPath, imgBuffer)
+
+      await conn.sendMessage(m.chat, {
+        image: fs.readFileSync(imgPath),
+        caption: '> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა'
+      }, { quoted: m })
+
+      fs.unlinkSync(imgPath)
+      await m.react('✅')
+      return true
+    }
+
+    // Manejar meme aleatorio y cualquier otro comando
+    const plugin = Object.values(global.plugins).find(p => {
+      if (p.disabled) return false
+      const cmds = Array.isArray(p.command) ? p.command : [p.command]
+      return cmds.includes(id)
+    })
+
+    if (!plugin) return false
+
+    await m.react('⏳')
+    m.text = ''
+    m.body = id
+
+    await plugin(m, {
+      conn,
+      text: '',
+      usedPrefix: '!',
+      command: id,
+      args: [],
+      v: m
+    })
+
+    await m.react('✅')
+    return true
+
+  } catch (e) {
+    console.log('[MEME ERROR]', e)
+    await conn.sendMessage(m.chat, { text: `❌ Error: ${e.message}` }, { quoted: m })
+    await m.react('❌')
+    return true
   }
 }
 
