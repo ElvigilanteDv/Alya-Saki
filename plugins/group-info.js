@@ -1,7 +1,5 @@
-import fs from 'fs'
-
 const handler = async (m, { conn }) => {
-  if (!m.isGroup) return conn.sendMessage(m.chat, { text: '`❌ Este comando solo puede usarse en grupos`' }, { quoted: m })
+  if (!m.isGroup) return conn.sendMessage(m.chat, { text: '❌ Este comando solo puede usarse en grupos' }, { quoted: m })
   
   try {
     let metadata = await conn.groupMetadata(m.chat)
@@ -10,7 +8,7 @@ const handler = async (m, { conn }) => {
     let texto = `𑁍ࠬܓ ⁾ ㅤׄㅤׅㅤׄ INFO DEL GRUPO ㅤ֢ㅤׄㅤׅ\n\n`
     texto += `ׄㅤ𑁍ࠬܓε(´｡•᎑•`)っ ᜒ *Nombre:* ${metadata.subject}\n`
     texto += `ׄㅤ𑁍ࠬܓε(´｡•᎑•`)っ ᜒ *ID:* ${metadata.id}\n`
-    texto += `ׄㅤ𑁍ࠬܓε(´｡•᎑•`)っ ᜒ *Creador:* ${metadata.owner ? `@${metadata.owner.split('@')[0]}` : 'Desconocido'}\n`
+    texto += `ׄㅤ𑁍ࠬܓε(´｡•᎑•`)っ ᜒ *Creador:* ${metadata.owner ? '@' + metadata.owner.split('@')[0] : 'Desconocido'}\n`
     texto += `ׄㅤ𑁍ࠬܓε(´｡•᎑•`)っ ᜒ *Creado:* ${new Date(metadata.creation * 1000).toLocaleString()}\n`
     texto += `ׄㅤ𑁍ࠬܓε(´｡•᎑•`)っ ᜒ *Descripción:* ${metadata.desc || 'Sin descripción'}\n`
     texto += `ׄㅤ𑁍ࠬܓε(´｡•᎑•`)っ ᜒ *Miembros:* ${metadata.participants.length}\n`
@@ -26,13 +24,13 @@ const handler = async (m, { conn }) => {
     }, { quoted: m })
     
   } catch (e) {
+    console.log(e)
     await conn.sendMessage(m.chat, { text: '❌ Error al obtener la información del grupo' }, { quoted: m })
   }
 }
 
-handler.help = ['infogrupo']
+handler.help = ['infogrupo', 'groupinfo', 'gcinfo', 'grupoinfo']
 handler.tags = ['group']
 handler.command = /^(infogrupo|groupinfo|gcinfo|grupoinfo)$/i
-handler.group = true
 
 export default handler
