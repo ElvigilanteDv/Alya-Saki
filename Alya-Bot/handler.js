@@ -1,4 +1,3 @@
-// handler.js - Saki Bot
 import { generateWAMessageFromContent } from '@whiskeysockets/baileys';
 import { smsg } from '../lib/simple.js';
 import { format } from 'util';
@@ -15,7 +14,7 @@ const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(() => reso
 
 const dbPath = './src/database/aniadb.json';
 const newsletterJid = "120363407253203904@newsletter";
-const newsletterName = "Saki - ¢нαηηєℓ";
+const newsletterName = "YO OFC - ¢нαηηєℓ";
 
 export async function handler(chatUpdate) {
   this.msgqueque ||= [];
@@ -150,7 +149,7 @@ export async function handler(chatUpdate) {
     let usedPrefix;
     let _user = global.db.data.users[m.sender];
 
-    async function getLidFromJid(id, conn) { 
+    async function getLidFromJid(id, conn) {
       if (id.endsWith('@lid')) return id;
       const res = await conn.onWhatsApp(id).catch(() => []);
       return res[0]?.lid || id;
@@ -219,32 +218,22 @@ export async function handler(chatUpdate) {
             } catch (e) {}
 
             await this.sendMessage(m.chat, {
-              text: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+              text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *ANTILINK* 
+𑁍𓂃 𓈒𓏸 *ANTILINK*
 𑁍𓂃 𓈒𓏸 *USUARIO ::* @${m.sender.split('@')[0]}
 𑁍𓂃 𓈒𓏸 *ENLACE ::* ${linkEncontrado}
-𑁍𓂃 𓈒𓏸 *ACCIÓN ::* Eliminado y expulsado
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-              `.trim(),
+𑁍𓂃 𓈒𓏸 *ACCIÓN ::* Eliminado y expulsado`,
               contextInfo: contextInfo
             });
           } else {
             await this.sendMessage(m.chat, {
-              text: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+              text: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *ANTILINK* 
+𑁍𓂃 𓈒𓏸 *ANTILINK*
 𑁍𓂃 𓈒𓏸 *USUARIO ::* @${m.sender.split('@')[0]}
 𑁍𓂃 𓈒𓏸 *ENLACE ::* ${linkEncontrado}
-𑁍𓂃 𓈒𓏸 *ERROR ::* El bot necesita ser admin
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-              `.trim(),
+𑁍𓂃 𓈒𓏸 *ERROR ::* El bot necesita ser admin`,
               contextInfo: contextInfo
             });
           }
@@ -254,6 +243,8 @@ export async function handler(chatUpdate) {
 
     // ========== PROCESAR PLUGINS ==========
     let comandoEncontrado = false;
+    let prefixUsado = null;
+    let commandUsado = null;
     const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), '../plugins');
 
     for (let name in global.plugins) {
@@ -282,6 +273,11 @@ export async function handler(chatUpdate) {
         let text = _args.join` `;
         command = (command || '').toLowerCase();
         let fail = plugin.fail || global.dfail;
+
+        // Guardar prefijo y comando usados para detectar comando no encontrado
+        prefixUsado = usedPrefix;
+        commandUsado = command;
+
         let isAccept = plugin.command instanceof RegExp ? plugin.command.test(command) :
           Array.isArray(plugin.command) ? plugin.command.some(cmd => cmd instanceof RegExp ? cmd.test(command) : cmd === command) :
           plugin.command === command;
@@ -295,16 +291,11 @@ export async function handler(chatUpdate) {
         let chat = global.db.data.chats[m.chat];
         let user = global.db.data.users[m.sender];
         if (!['grupo-unbanchat.js', 'owner-exec.js', 'owner-exec2.js'].includes(name) && chat?.isBanned && !isROwner) return;
-        if (m.text && user.banned && !isROwner) { 
-          m.reply(`
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+        if (m.text && user.banned && !isROwner) {
+          m.reply(`> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *BANEADO* 
-𑁍𓂃 𓈒𓏸 *MOTIVO ::* ${user.bannedReason || 'Sin especificar'}
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-          `.trim());
+𑁍𓂃 𓈒𓏸 *BANEADO*
+𑁍𓂃 𓈒𓏸 *MOTIVO ::* ${user.bannedReason || 'Sin especificar'}`);
           return;
         }
 
@@ -326,29 +317,19 @@ export async function handler(chatUpdate) {
         let xp = 'exp' in plugin ? parseInt(plugin.exp) : 10;
         m.exp += xp;
         if (!isPrems && plugin.monedas && _user.USD < plugin.monedas) {
-          this.reply(m.chat, `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+          this.reply(m.chat, `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *MONEDAS INSUFICIENTES* 
-𑁍𓂃 𓈒𓏸 *NECESITAS ::* ${plugin.monedas} USD
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-          `.trim(), m);
+𑁍𓂃 𓈒𓏸 *MONEDAS INSUFICIENTES*
+𑁍𓂃 𓈒𓏸 *NECESITAS ::* ${plugin.monedas} USD`, m);
           continue;
         }
 
         if (plugin.level > _user.level) {
-          this.reply(m.chat, `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+          this.reply(m.chat, `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *NIVEL INSUFICIENTE* 
+𑁍𓂃 𓈒𓏸 *NIVEL INSUFICIENTE*
 𑁍𓂃 𓈒𓏸 *NECESITAS ::* Nivel ${plugin.level}
-𑁍𓂃 𓈒𓏸 *TU NIVEL ::* ${_user.level}
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-          `.trim(), m);
+𑁍𓂃 𓈒𓏸 *TU NIVEL ::* ${_user.level}`, m);
           continue;
         }
 
@@ -363,18 +344,23 @@ export async function handler(chatUpdate) {
           m.reply(text);
         } finally {
           if (typeof plugin.after === 'function') await plugin.after.call(this, m, extra).catch(console.error);
-          if (m.monedas) this.reply(m.chat, `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+          if (m.monedas) this.reply(m.chat, `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *GASTO* 
-𑁍𓂃 𓈒𓏸 *MONEDAS ::* ${+m.monedas} USD
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-          `.trim(), m);
+𑁍𓂃 𓈒𓏸 *GASTO*
+𑁍𓂃 𓈒𓏸 *MONEDAS ::* ${+m.monedas} USD`, m);
         }
         break;
       }
+    }
+
+    // ========== COMANDO NO ENCONTRADO ==========
+    if (!comandoEncontrado && prefixUsado && commandUsado) {
+      await m.reply(`> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+
+𑁍𓂃 𓈒𓏸 *ERROR ::* Comando no encontrado
+𑁍𓂃 𓈒𓏸 *COMANDO ::* ${prefixUsado}${commandUsado}
+𑁍𓂃 𓈒𓏸 *SUGERENCIA ::* Usa ${prefixUsado}menu para ver los comandos disponibles`)
+      await m.react('❌')
     }
 
   } catch (e) { console.error(e); } finally {
@@ -410,88 +396,43 @@ export async function handler(chatUpdate) {
 
 global.dfail = (type, m, conn, usedPrefix) => {
   const msg = {
-    rowner: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+    rowner: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *ACCESO RESTRINGIDO* 
-𑁍𓂃 𓈒𓏸 Solo *el creador* puede usar esto
+𑁍𓂃 𓈒𓏸 *ACCESO RESTRINGIDO*
+𑁍𓂃 𓈒𓏸 Solo *el creador* puede usar esto`,
+    owner: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    owner: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+𑁍𓂃 𓈒𓏸 *SOLO OWNER*
+𑁍𓂃 𓈒𓏸 Solo *el dueño del bot* puede usar esto`,
+    premium: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *SOLO OWNER* 
-𑁍𓂃 𓈒𓏸 Solo *el dueño del bot* puede usar esto
+𑁍𓂃 𓈒𓏸 *PREMIUM REQUERIDO*
+𑁍𓂃 𓈒𓏸 Solo para usuarios *Premium*`,
+    private: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    premium: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+𑁍𓂃 𓈒𓏸 *SOLO PRIVADO*
+𑁍𓂃 𓈒𓏸 Este comando solo funciona en privado`,
+    group: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *PREMIUM REQUERIDO* 
-𑁍𓂃 𓈒𓏸 Solo para usuarios *Premium*
+𑁍𓂃 𓈒𓏸 *SOLO GRUPOS*
+𑁍𓂃 𓈒𓏸 Este comando solo funciona en grupos`,
+    admin: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    private: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+𑁍𓂃 𓈒𓏸 *SOLO ADMIN*
+𑁍𓂃 𓈒𓏸 Solo *administradores* pueden usar esto`,
+    botAdmin: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *SOLO PRIVADO* 
-𑁍𓂃 𓈒𓏸 Este comando solo funciona en privado
+𑁍𓂃 𓈒𓏸 *BOT ADMIN*
+𑁍𓂃 𓈒𓏸 El bot necesita ser *administrador* del grupo`,
+    unreg: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    group: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
-
-𑁍𓂃 𓈒𓏸 *SOLO GRUPOS* 
-𑁍𓂃 𓈒𓏸 Este comando solo funciona en grupos
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    admin: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
-
-𑁍𓂃 𓈒𓏸 *SOLO ADMIN* 
-𑁍𓂃 𓈒𓏸 Solo *administradores* pueden usar esto
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    botAdmin: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
-
-𑁍𓂃 𓈒𓏸 *BOT ADMIN* 
-𑁍𓂃 𓈒𓏸 El bot necesita ser *administrador* del grupo
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    unreg: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
-
-𑁍𓂃 𓈒𓏸 *SIN REGISTRAR* 
+𑁍𓂃 𓈒𓏸 *SIN REGISTRAR*
 𑁍𓂃 𓈒𓏸 Usa: *${usedPrefix || '#'}registrar <Nombre.Edad>*
-𑁍𓂃 𓈒𓏸 Ejemplo: *${usedPrefix || '#'}registrar Saki.17*
+𑁍𓂃 𓈒𓏸 Ejemplo: *${usedPrefix || '#'}registrar YO OFC.17*`,
+    mods: `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `,
-    mods: `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
-
-𑁍𓂃 𓈒𓏸 *SOLO MODS* 
-𑁍𓂃 𓈒𓏸 Solo *moderadores* pueden usar esto
-
-> *Saki desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა
-> *Mano Derecha: Leo*
-    `
+𑁍𓂃 𓈒𓏸 *SOLO MODS*
+𑁍𓂃 𓈒𓏸 Solo *moderadores* pueden usar esto`
   };
   if (msg[type]) return m.reply(msg[type]).then(() => m.react('❌'));
 };
@@ -499,7 +440,7 @@ global.dfail = (type, m, conn, usedPrefix) => {
 let file = global.__filename(import.meta.url, true);
 watchFile(file, async () => {
   unwatchFile(file);
-  console.log(chalk.magenta("🔄 Se actualizó 'handler.js' de Saki - вσт"));
+  console.log(chalk.magenta("🔄 Se actualizó 'handler.js' de YO OFC - вσт"));
   if (global.conns && global.conns.length > 0) {
     const users = [...new Set([...global.conns.filter((conn) => conn.user && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED).map((conn) => conn)])];
     for (const userr of users) {
