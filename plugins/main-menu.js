@@ -64,7 +64,7 @@ let handler = async (m, { conn, usedPrefix: _p }) => {
         desc: p.desc || ''
       }))
 
-    let bannerFinal = 'https://files.catbox.moe/z2ij0x.jpeg'
+    let bannerFinal = 'https://files.catbox.moe/22vhqk.jpeg'
 
     let textoMenu = defaultMenu.before
       .replace(/%time/g, new Date().toLocaleString())
