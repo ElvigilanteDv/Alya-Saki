@@ -318,7 +318,7 @@ const { id, participants, action } = update
 𑁍𓂃 𓈒𓏸 MIEMBROS :: ${memberCount}
 𑁍𓂃 𓈒𓏸 GRUPO :: ${groupName}
 
-«YO OFC desarrollado por EL VIGILANTE ૮(˶ᵔᵕᵔ˶)ა`»
+«YO OFC desarrollado por EL VIGILANTE ૮(˶ᵔᵕᵔ/˶)ა`»
 
         await global.conn.sendMessage(id, {
             image: { url: groupIcon },
@@ -352,7 +352,7 @@ const { id, participants, action } = update
 𑁍𓂃 𓈒𓏸 USUARIO :: ${nombres.join(', ')}
 𑁍𓂃 𓈒𓏸 MIEMBROS RESTANTES :: ${memberCount}
 
-«YO OFC desarrollado por EL VIGILANTE ૮(˶ᵔᵕᵔ˶)ა`»
+«YO OFC desarrollado por EL VIGILANTE ૮(˶ᵔᵕᵔ/˶)ა`»
 
         await global.conn.sendMessage(id, {
             image: { url: groupIcon },
