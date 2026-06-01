@@ -167,7 +167,7 @@ global.conn = makeWASocket(connectionOptions)
 if (opcion === '2' && !credsExist && !codeRequested) {
     codeRequested = true
     let addNumber = null
-    
+
     if (!!phoneNumber && phoneNumber !== '') {
         addNumber = phoneNumber.replace(/[^0-9]/g, '')
         console.log(chalk.bold.cyan(`📌 Usando número configurado: ${addNumber}`))
@@ -185,9 +185,9 @@ if (opcion === '2' && !credsExist && !codeRequested) {
         }
         rl.close()
     }
-    
+
     console.log(chalk.bold.cyan(`📌 Solicitando código de 8 dígitos...`))
-    
+
     setTimeout(async () => {
         try {
             let code = await global.conn.requestPairingCode(addNumber)
@@ -274,103 +274,95 @@ async function connectionUpdate(update) {
 let lastWelcomeEvent = {}
 
 global.conn.ev.on('group-participants.update', async (update) => {
-try {
-const { id, participants, action } = update
+    try {
+        const { id, participants, action } = update
 
-    const eventKey = `${id}_${action}_${participants.sort().join(',')}`
-    const now = Date.now()
+        const eventKey = `${id}_${action}_${participants.sort().join(',')}`
+        const now = Date.now()
 
-    if (lastWelcomeEvent[eventKey] && (now - lastWelcomeEvent[eventKey] < 2000)) {
-        console.log('Evento duplicado ignorado')
-        return
-    }
-    lastWelcomeEvent[eventKey] = now
-
-    if (!global.db.data) await loadDatabase()
-    if (!global.db.data.chats[id]) global.db.data.chats[id] = {}
-
-    const chat = global.db.data.chats[id]
-    const welcomeEnabled = chat.welcome !== false
-    if (!welcomeEnabled) return
-
-    const groupMetadata = await global.conn.groupMetadata(id).catch(() => null)
-    if (!groupMetadata) return
-
-    const groupName = groupMetadata.subject || 'ᴇʟ ɢʀᴜᴘᴏ'
-    const memberCount = groupMetadata.participants.length
-    const groupIcon = await getGroupPicture(id)
-
-    if (action === 'add') {
-        const jids = participants
-        const nombres = []
-
-        for (const jid of jids) {
-            if (!global.db.data.users[jid]) global.db.data.users[jid] = {}
-            nombres.push(`@${jid.split('@')[0]}`)
+        if (lastWelcomeEvent[eventKey] && (now - lastWelcomeEvent[eventKey] < 2000)) {
+            console.log('Evento duplicado ignorado')
+            return
         }
+        lastWelcomeEvent[eventKey] = now
 
-        const welcomeText = chat.welcomeMessage || `
+        if (!global.db.data) await loadDatabase()
+        if (!global.db.data.chats[id]) global.db.data.chats[id] = {}
+        const chat = global.db.data.chats[id]
+        const welcomeEnabled = chat.welcome !== false
+        if (!welcomeEnabled) return
 
-«¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡»
+        const groupMetadata = await global.conn.groupMetadata(id).catch(() => null)
+        if (!groupMetadata) return
+        const groupName = groupMetadata.subject || 'ᴇʟ ɢʀᴜᴘᴏ'
+        const memberCount = groupMetadata.participants.length
+        let groupIcon = await getGroupPicture(id)
 
-𑁍𓂃 𓈒𓏸 BIENVENID@ AL GRUPO
-𑁍𓂃 𓈒𓏸 USUARIO :: ${nombres.join(', ')}
-𑁍𓂃 𓈒𓏸 MIEMBROS :: ${memberCount}
-𑁍𓂃 𓈒𓏸 GRUPO :: ${groupName}
+        if (action === 'add') {
+            const jids = participants
+            const nombres = []
 
-«YO OFC desarrollado por EL VIGILANTE
+            for (const jid of jids) {
+                if (!global.db.data.users[jid]) global.db.data.users[jid] = {}
+                nombres.push(`@${jid.split('@')[0]}`)
+            }
 
-        await global.conn.sendMessage(id, {
-            image: { url: groupIcon },
-            caption: welcomeText,
-            mentions: jids
-        })
+            let welcomeText = chat.welcomeMessage || `
+ㅤ    ꒰  ㅤ 🌸 ㅤ *Saki - вσт* ㅤ ⫏⫏  ꒱
+ㅤ    ⿻ ㅤ ✿ ㅤ вιєηνєηι∂@ 木 ✨ ㅤ 性
 
-        for (const jid of jids) {
-            const userData = global.db.data.users[jid]
+> ₊· ⫏⫏ ㅤ 👤 ${nombres.join(', ')}
+> ₊· ⫏⫏ ㅤ 👥 Mɪᴇᴍʙʀᴏs: ${memberCount}
 
-            if (chat.welcomeBonus !== false) {
-                userData.monedas = (userData.monedas || 0) + 50
-                userData.exp = (userData.exp || 0) + 100
+ㅤ    ꒰  ㅤ ✿ ㅤ *Saki - вσт* ㅤ ⫏⫏ ꒱
+> ₊· ⫏⫏ ㅤ 🌟 Disfruta ${groupName}`
+
+            await global.conn.sendMessage(id, {
+                image: { url: groupIcon },
+                caption: welcomeText,
+                mentions: jids
+            })
+
+            for (const jid of jids) {
+                const userData = global.db.data.users[jid]
+                if (chat.welcomeBonus !== false) {
+                    userData.monedas = (userData.monedas || 0) + 50
+                    userData.exp = (userData.exp || 0) + 100
+                }
             }
         }
-    }
 
-    if (action === 'remove') {
-        const jids = participants
-        const nombres = []
+        if (action === 'remove') {
+            const jids = participants
+            const nombres = []
 
-        for (const jid of jids) {
-            nombres.push(`@${jid.split('@')[0]}`)
+            for (const jid of jids) {
+                nombres.push(`@${jid.split('@')[0]}`)
+            }
+
+            const goodbyeText = `
+ㅤ    ꒰  ㅤ 👋 ㅤ *Saki - вσт* ㅤ ⫏⫏  ꒱
+ㅤ    ⿻ ㅤ ✿ ㅤ нαsтα 木 ρʀᴏɴтᴏ ㅤ 性
+
+> ₊· ⫏⫏ ㅤ 👤 ${nombres.join(', ')} нᴀɴ ᴀʙᴀɴᴅᴏɴᴀᴅᴏ
+> ₊· ⫏⫏ ㅤ 👥 Mɪᴇᴍʙʀᴏs ʀᴇsᴛᴀɴᴛᴇs: ${memberCount}
+
+ㅤ    ꒰  ㅤ ✿ ㅤ *Saki - вσт* ㅤ ⫏⫏ ꒱`
+
+            await global.conn.sendMessage(id, {
+                image: { url: groupIcon },
+                caption: goodbyeText,
+                mentions: jids
+            })
         }
 
-        const goodbyeText = `
-
-«¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡»
-
-𑁍𓂃 𓈒𓏸 HASTA PRONTO
-𑁍𓂃 𓈒𓏸 USUARIO :: ${nombres.join(', ')}
-𑁍𓂃 𓈒𓏸 MIEMBROS RESTANTES :: ${memberCount}
-
-«YO OFC desarrollado por EL VIGILANTE 
-
-        await global.conn.sendMessage(id, {
-            image: { url: groupIcon },
-            caption: goodbyeText,
-            mentions: jids
-        })
-    }
-
-    for (const key in lastWelcomeEvent) {
-        if (Date.now() - lastWelcomeEvent[key] > 5000) {
-            delete lastWelcomeEvent[key]
+        for (const key in lastWelcomeEvent) {
+            if (Date.now() - lastWelcomeEvent[key] > 5000) {
+                delete lastWelcomeEvent[key]
+            }
         }
-    }
 
-} catch (e) {
-    console.error('Error en group-participants:', e)
-}
-
+    } catch (e) { console.error('Error en group-participants:', e) }
 })
 
 process.on('uncaughtException', (err) => {
