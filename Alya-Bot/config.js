@@ -10,9 +10,9 @@ import moment from 'moment-timezone';
 global.botNumber = '';
 
 global.owner = [
-  ['59177474230', '👑 E∂ωαя∂', true],
-  ['59177474230@s.whatsapp.net', 'E∂ωαя∂', true],
-  ['59177474230@c.us', 'E∂ωαя∂', true],
+  ['59177474230', '👑 EL VIGILANTE', true],
+  ['59177474230@s.whatsapp.net', 'EL VIGILANTE', true],
+  ['59177474230@c.us', 'EL VIGILANTE', true],
   ['584241819270', '🤝 Lєσ', true],
   ['584241819270@s.whatsapp.net', 'Lєσ', true],
   ['584241819270@c.us', 'Lєσ', true]
@@ -27,47 +27,48 @@ global.baileys = 'V 6.7.9';
 global.languaje = 'Español';
 global.vs = '2.2.0';
 global.vsJB = '5.0';
-global.nameqr = '🌸 Saki - вσт 🌸';
-global.sessions = 'SakiSesions';
-global.jadi = 'SakiJadiBot';
+global.nameqr = '𓆩⚝𓆪 YO OFC 𓍯 𓆩⚝𓆪';
+global.sessions = 'YoOfcSesions';
+global.jadi = 'YoOfcJadiBot';
 global.blackJadibts = true;
 
 global.packsticker = `
 > ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
 𑁍𓂃 𓈒𓏸 *STICKER* 
-𑁍𓂃 𓈒𓏸 *CREADOR:* E∂ωαя∂
+𑁍𓂃 𓈒𓏸 *CREADOR ::* EL VIGILANTE
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა`;
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`;
 
-global.packname = 'Saki - вσт';
+global.packname = 'YO OFC - вσт';
 
 global.author = `
 > ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-𑁍𓂃 𓈒𓏸 *SAKI BOT*
+𑁍𓂃 𓈒𓏸 *YO OFC - вσт*
+𑁍𓂃 𓈒𓏸 *DEVELOPER ::* EL VIGILANTE
 
-> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა`;
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`;
 
-global.wm = 'Saki - вσт';
-global.titulowm = 'Saki - вσт';
-global.igfg = 'E∂ωαя∂';
-global.botname = 'Saki - вσт';
-global.dev = '> *Saki desarrollado por Edward* ૮(˶ᵔᵕᵔ˶)ა';
-global.textbot = 'Saki - вσт : E∂ωαя∂';
-global.gt = 'Saki - вσт';
-global.namechannel = 'Saki - вσт / E∂ωαя∂';
+global.wm = 'YO OFC - вσт';
+global.titulowm = 'YO OFC - вσт';
+global.igfg = 'EL VIGILANTE';
+global.botname = 'YO OFC - вσт';
+global.dev = '> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა';
+global.textbot = 'YO OFC - вσт : EL VIGILANTE';
+global.gt = 'YO OFC - вσт';
+global.namechannel = 'YO OFC - вσт / EL VIGILANTE';
 
 global.monedas = 'мσηє∂αѕ';
 
-global.gp1 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
-global.gp2 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
-global.comunidad1 = 'https://chat.whatsapp.com/LPHJXnuklWy62oyHB3FJoQ';
-global.channel = '';
+global.gp1 = 'https://chat.whatsapp.com/IQQCPHdjqUU50t5FgShLdd';
+global.gp2 = 'https://chat.whatsapp.com/IQQCPHdjqUU50t5FgShLdd';
+global.comunidad1 = 'https://chat.whatsapp.com/IQQCPHdjqUU50t5FgShLdd';
+global.channel = 'https://whatsapp.com/channel/0029VbCOTaJ9RZAQPdiZ4J1K';
 global.cn = global.channel;
-global.yt = 'https://youtube.com/@E∂ωαя∂';
-global.md = 'https://github.com/Edward/Saki-Bot';
-global.correo = 'edward@sakibot.com';
+global.yt = 'https://youtube.com/@ElVigilanteDv';
+global.md = 'https://github.com/ElvigilanteDv';
+global.correo = 'elvigilante@yoofc.com';
 
 global.catalogo = null;
 try {
@@ -94,14 +95,14 @@ global.estilo = {
       status: 1, 
       surface : 1, 
       message: global.packname, 
-      orderTitle: 'Saki - вσт', 
+      orderTitle: 'YO OFC - вσт', 
       thumbnail: global.catalogo || Buffer.from(''), 
       sellerJid: '0@s.whatsapp.net'
     }
   }
 };
 
-global.ch = { ch1: "" };
+global.ch = { ch1: "https://whatsapp.com/channel/0029VbCOTaJ9RZAQPdiZ4J1K" };
 global.rcanal = global.ch.ch1;
 
 global.cheerio = cheerio;
@@ -116,7 +117,7 @@ global.maxwarn = 3;
 const file = fileURLToPath(import.meta.url);
 watchFile(file, () => {
   unwatchFile(file);
-  console.log(chalk.magenta('🔄 Sє α¢тυαℓízσ ∂є Saki - вσт 🌸'));
+  console.log(chalk.magenta('🔄 Sє α¢тυαℓízσ ∂є YO OFC - вσт ✿'));
 });
 
-console.log(chalk.green('✅ cσηfιg.נѕ ¢αrgα∂σ ¢σrrє¢тαмєηтє 🌸'));
+console.log(chalk.green('✅ cσηfιg.נѕ ¢αrgα∂σ ¢σrrє¢тαмєηтє ✿'));
