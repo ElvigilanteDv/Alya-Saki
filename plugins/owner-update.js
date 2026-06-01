@@ -11,7 +11,7 @@ let handler = async (m, { conn, args, isOwner }) => {
 > *Mano Derecha: Leo*`, m)
   }
 
-  const imagenURL = 'https://files.catbox.moe/vb9zu1.jpg'
+  const imagenURL = 'https://files.catbox.moe/22vhqk.jpeg'
 
   try {
     await conn.reply(m.chat, `> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
