@@ -308,61 +308,60 @@ global.conn.ev.on('group-participants.update', async (update) => {
             }
 
             let welcomeText = chat.welcomeMessage || `
-ㅤ    ꒰  ㅤ 🌸 ㅤ *Saki - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ вιєηνєηι∂@ 木 ✨ ㅤ 性
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ 👤 ${nombres.join(', ')}
-> ₊· ⫏⫏ ㅤ 👥 Mɪᴇᴍʙʀᴏs: ${memberCount}
+𑁍𓂃 𓈒𓏸 *BIENVENID@ AL GRUPO*
+𑁍𓂃 𓈒𓏸 *USUARIO ::* ${nombres.join(', ')}
+𑁍𓂃 𓈒𓏸 *MIEMBROS ::* ${memberCount}
+𑁍𓂃 𓈒𓏸 *GRUPO ::* ${groupName}
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *Saki - вσт* ㅤ ⫏⫏ ꒱
-> ₊· ⫏⫏ ㅤ 🌟 Disfruta ${groupName}`
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
 
-            await global.conn.sendMessage(id, {
-                image: { url: groupIcon },
-                caption: welcomeText,
-                mentions: jids
-            })
+await global.conn.sendMessage(id, {
+    image: { url: groupIcon },
+    caption: welcomeText,
+    mentions: jids
+})
 
-            for (const jid of jids) {
-                const userData = global.db.data.users[jid]
-                if (chat.welcomeBonus !== false) {
-                    userData.monedas = (userData.monedas || 0) + 50
-                    userData.exp = (userData.exp || 0) + 100
-                }
-            }
-        }
+for (const jid of jids) {
+    const userData = global.db.data.users[jid]
+    if (chat.welcomeBonus !== false) {
+        userData.monedas = (userData.monedas || 0) + 50
+        userData.exp = (userData.exp || 0) + 100
+    }
+}
 
-        if (action === 'remove') {
-            const jids = participants
-            const nombres = []
+if (action === 'remove') {
+    const jids = participants
+    const nombres = []
 
-            for (const jid of jids) {
-                nombres.push(`@${jid.split('@')[0]}`)
-            }
+    for (const jid of jids) {
+        nombres.push(`@${jid.split('@')[0]}`)
+    }
 
-            const goodbyeText = `
-ㅤ    ꒰  ㅤ 👋 ㅤ *Saki - вσт* ㅤ ⫏⫏  ꒱
-ㅤ    ⿻ ㅤ ✿ ㅤ нαsтα 木 ρʀᴏɴтᴏ ㅤ 性
+    const goodbyeText = `
+> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
 
-> ₊· ⫏⫏ ㅤ 👤 ${nombres.join(', ')} нᴀɴ ᴀʙᴀɴᴅᴏɴᴀᴅᴏ
-> ₊· ⫏⫏ ㅤ 👥 Mɪᴇᴍʙʀᴏs ʀᴇsᴛᴀɴᴛᴇs: ${memberCount}
+𑁍𓂃 𓈒𓏸 *HASTA PRONTO*
+𑁍𓂃 𓈒𓏸 *USUARIO ::* ${nombres.join(', ')}
+𑁍𓂃 𓈒𓏸 *MIEMBROS RESTANTES ::* ${memberCount}
 
-ㅤ    ꒰  ㅤ ✿ ㅤ *Saki - вσт* ㅤ ⫏⫏ ꒱`
+> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
 
-            await global.conn.sendMessage(id, {
-                image: { url: groupIcon },
-                caption: goodbyeText,
-                mentions: jids
-            })
-        }
+    await global.conn.sendMessage(id, {
+        image: { url: groupIcon },
+        caption: goodbyeText,
+        mentions: jids
+    })
+}
 
-        for (const key in lastWelcomeEvent) {
-            if (Date.now() - lastWelcomeEvent[key] > 5000) {
-                delete lastWelcomeEvent[key]
-            }
-        }
+for (const key in lastWelcomeEvent) {
+    if (Date.now() - lastWelcomeEvent[key] > 5000) {
+        delete lastWelcomeEvent[key]
+    }
+}
 
-    } catch (e) { console.error('Error en group-participants:', e) }
+} catch (e) { console.error('Error en group-participants:', e) }
 })
 
 process.on('uncaughtException', (err) => {
