@@ -29,8 +29,8 @@ const handler = async (m, { conn }) => {
   }
 }
 
-handler.help = ['infogrupo', 'groupinfo', 'gcinfo', 'grupoinfo']
+handler.help = ['infogrupo']
 handler.tags = ['group']
-handler.command = /^(infogrupo|groupinfo|gcinfo|grupoinfo)$/i
+handler.command = ['infogrupo']
 
 export default handler
