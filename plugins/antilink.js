@@ -59,6 +59,7 @@ handler.help = ['antilink']
 handler.tags = ['group']
 handler.command = ['antilink']
 handler.group = true
+handler.botAdmin = true
 
 handler.before = async (m, { conn, isOwner, isAdmin }) => {
   if (!m.isGroup) return false
