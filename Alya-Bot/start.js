@@ -274,94 +274,103 @@ async function connectionUpdate(update) {
 let lastWelcomeEvent = {}
 
 global.conn.ev.on('group-participants.update', async (update) => {
-    try {
-        const { id, participants, action } = update
+try {
+const { id, participants, action } = update
 
-        const eventKey = `${id}_${action}_${participants.sort().join(',')}`
-        const now = Date.now()
+    const eventKey = `${id}_${action}_${participants.sort().join(',')}`
+    const now = Date.now()
 
-        if (lastWelcomeEvent[eventKey] && (now - lastWelcomeEvent[eventKey] < 2000)) {
-            console.log('Evento duplicado ignorado')
-            return
+    if (lastWelcomeEvent[eventKey] && (now - lastWelcomeEvent[eventKey] < 2000)) {
+        console.log('Evento duplicado ignorado')
+        return
+    }
+    lastWelcomeEvent[eventKey] = now
+
+    if (!global.db.data) await loadDatabase()
+    if (!global.db.data.chats[id]) global.db.data.chats[id] = {}
+
+    const chat = global.db.data.chats[id]
+    const welcomeEnabled = chat.welcome !== false
+    if (!welcomeEnabled) return
+
+    const groupMetadata = await global.conn.groupMetadata(id).catch(() => null)
+    if (!groupMetadata) return
+
+    const groupName = groupMetadata.subject || 'ᴇʟ ɢʀᴜᴘᴏ'
+    const memberCount = groupMetadata.participants.length
+    const groupIcon = await getGroupPicture(id)
+
+    if (action === 'add') {
+        const jids = participants
+        const nombres = []
+
+        for (const jid of jids) {
+            if (!global.db.data.users[jid]) global.db.data.users[jid] = {}
+            nombres.push(`@${jid.split('@')[0]}`)
         }
-        lastWelcomeEvent[eventKey] = now
 
-        if (!global.db.data) await loadDatabase()
-        if (!global.db.data.chats[id]) global.db.data.chats[id] = {}
-        const chat = global.db.data.chats[id]
-        const welcomeEnabled = chat.welcome !== false
-        if (!welcomeEnabled) return
+        const welcomeText = chat.welcomeMessage || `
 
-        const groupMetadata = await global.conn.groupMetadata(id).catch(() => null)
-        if (!groupMetadata) return
-        const groupName = groupMetadata.subject || 'ᴇʟ ɢʀᴜᴘᴏ'
-        const memberCount = groupMetadata.participants.length
-        let groupIcon = await getGroupPicture(id)
+«¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡»
 
-        if (action === 'add') {
-            const jids = participants
-            const nombres = []
+𑁍𓂃 𓈒𓏸 BIENVENID@ AL GRUPO
+𑁍𓂃 𓈒𓏸 USUARIO :: ${nombres.join(', ')}
+𑁍𓂃 𓈒𓏸 MIEMBROS :: ${memberCount}
+𑁍𓂃 𓈒𓏸 GRUPO :: ${groupName}
 
-            for (const jid of jids) {
-                if (!global.db.data.users[jid]) global.db.data.users[jid] = {}
-                nombres.push(`@${jid.split('@')[0]}`)
+«YO OFC desarrollado por EL VIGILANTE ૮(˶ᵔᵕᵔ˶)ა`»
+
+        await global.conn.sendMessage(id, {
+            image: { url: groupIcon },
+            caption: welcomeText,
+            mentions: jids
+        })
+
+        for (const jid of jids) {
+            const userData = global.db.data.users[jid]
+
+            if (chat.welcomeBonus !== false) {
+                userData.monedas = (userData.monedas || 0) + 50
+                userData.exp = (userData.exp || 0) + 100
             }
-
-            let welcomeText = chat.welcomeMessage || `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
-
-𑁍𓂃 𓈒𓏸 *BIENVENID@ AL GRUPO*
-𑁍𓂃 𓈒𓏸 *USUARIO ::* ${nombres.join(', ')}
-𑁍𓂃 𓈒𓏸 *MIEMBROS ::* ${memberCount}
-𑁍𓂃 𓈒𓏸 *GRUPO ::* ${groupName}
-
-> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
-
-await global.conn.sendMessage(id, {
-    image: { url: groupIcon },
-    caption: welcomeText,
-    mentions: jids
-})
-
-for (const jid of jids) {
-    const userData = global.db.data.users[jid]
-    if (chat.welcomeBonus !== false) {
-        userData.monedas = (userData.monedas || 0) + 50
-        userData.exp = (userData.exp || 0) + 100
-    }
-}
-
-if (action === 'remove') {
-    const jids = participants
-    const nombres = []
-
-    for (const jid of jids) {
-        nombres.push(`@${jid.split('@')[0]}`)
+        }
     }
 
-    const goodbyeText = `
-> ¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡
+    if (action === 'remove') {
+        const jids = participants
+        const nombres = []
 
-𑁍𓂃 𓈒𓏸 *HASTA PRONTO*
-𑁍𓂃 𓈒𓏸 *USUARIO ::* ${nombres.join(', ')}
-𑁍𓂃 𓈒𓏸 *MIEMBROS RESTANTES ::* ${memberCount}
+        for (const jid of jids) {
+            nombres.push(`@${jid.split('@')[0]}`)
+        }
 
-> *YO OFC desarrollado por EL VIGILANTE* ૮(˶ᵔᵕᵔ˶)ა`
+        const goodbyeText = `
 
-    await global.conn.sendMessage(id, {
-        image: { url: groupIcon },
-        caption: goodbyeText,
-        mentions: jids
-    })
-}
+«¡Hola, buenas tardes! ⸜(｡˃ ᵕ ˂ )⸝♡»
 
-for (const key in lastWelcomeEvent) {
-    if (Date.now() - lastWelcomeEvent[key] > 5000) {
-        delete lastWelcomeEvent[key]
+𑁍𓂃 𓈒𓏸 HASTA PRONTO
+𑁍𓂃 𓈒𓏸 USUARIO :: ${nombres.join(', ')}
+𑁍𓂃 𓈒𓏸 MIEMBROS RESTANTES :: ${memberCount}
+
+«YO OFC desarrollado por EL VIGILANTE ૮(˶ᵔᵕᵔ˶)ა`»
+
+        await global.conn.sendMessage(id, {
+            image: { url: groupIcon },
+            caption: goodbyeText,
+            mentions: jids
+        })
     }
+
+    for (const key in lastWelcomeEvent) {
+        if (Date.now() - lastWelcomeEvent[key] > 5000) {
+            delete lastWelcomeEvent[key]
+        }
+    }
+
+} catch (e) {
+    console.error('Error en group-participants:', e)
 }
 
-} catch (e) { console.error('Error en group-participants:', e) }
 })
 
 process.on('uncaughtException', (err) => {
